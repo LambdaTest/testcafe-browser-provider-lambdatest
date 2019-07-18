@@ -92,7 +92,7 @@ async function _parseCapabilities (capability) {
     }
 
     if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities.build = PROCESS_ENVIRONMENT.LT_BUILD;
-    if (PROCESS_ENVIRONMENT.LT_NAME) capabilities.name = PROCESS_ENVIRONMENT.LT_NAME;
+    if (PROCESS_ENVIRONMENT.LT_TEST_NAME) capabilities.name = PROCESS_ENVIRONMENT.LT_TEST_NAME;
     
     if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
     else capabilities.tunnelName = await connectorInstance.getTunnelName();
@@ -101,7 +101,7 @@ async function _parseCapabilities (capability) {
     if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
     if (PROCESS_ENVIRONMENT.LT_CONSOLE) capabilities.console = true;
     if (PROCESS_ENVIRONMENT.LT_NETWORK) capabilities.network = true;
-    if (PROCESS_ENVIRONMENT.LT_VIDEOS) capabilities.video = true;
+    if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities.video = true;
     if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities.visual = true;
     if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities.timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
     

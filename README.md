@@ -1,6 +1,5 @@
 # testcafe-browser-provider-lambdatest
-[![Build Status](https://travis-ci.org/DevExpress/testcafe-browser-provider-lambdatest.svg)](https://travis-ci.org/DevExpress/testcafe-browser-provider-lambdatest)
-[![Build Status](https://ci.appveyor.com/api/projects/status/47hkm5kr9c6ftb9u/branch/master?svg=true)](https://ci.appveyor.com/project/DevExpress/testcafe-browser-provider-lambdatest/branch/master)
+[![Build Status](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest.svg)](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest)
 
 This plugin integrates [TestCafe](http://devexpress.github.io/testcafe) with the [LambdaTest Testing Cloud](https://www.lambdatest.com/).
 

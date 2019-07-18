@@ -41,6 +41,7 @@ Use the following environment variables to set additional configuration options:
  - `LT_TEST_NAME` - Test name on LambdaTest.
  - `LT_BUILD` - Build name on LambdaTest.
  - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON.
+    
     ```js
         "Chrome@63.0:Windows 8.1" : {
             "network" : true,

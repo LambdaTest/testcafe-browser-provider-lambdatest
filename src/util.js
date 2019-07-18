@@ -1,3 +1,4 @@
+'use strict';
 import _request from 'request';
 import Promise from 'pinkie';
 import pify from 'pify';

@@ -1,3 +1,4 @@
+'use strict';
 import wd from 'wd';
 import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus } from './util';
 const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';

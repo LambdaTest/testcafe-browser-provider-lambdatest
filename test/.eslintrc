@@ -1,5 +1,15 @@
 {
+  "rules": {
+    "no-unused-expressions": 0,
+    "max-nested-callbacks": [
+      "error",
+      4
+    ]
+  },
   "env": {
     "mocha": true
+  },
+  "globals": {
+    "fixture": true
   }
 }

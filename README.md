@@ -56,7 +56,7 @@ Use the following environment variables to set additional configuration options:
  - `LT_PROXY_PORT` - Port for the proxy, by default it would consider 3128 if proxyhost is used For Basic Authentication, we use the below proxy options.
  - `LT_PROXY_USER` - Username for connecting to proxy, mandatory value for using 'proxypass'.
  - `LT_PROXY_PASS` - Password for the USERNAME option.
- - `LT_TUNNEL_NAME`
+ - `LT_TUNNEL_NAME` - Human readable tunnel identifier (Name of the tunnel).
  - `LT_DIR` - Path of the local folder you want to test.
  - `LT_SELENIUM_VERSION` - Browser specific capability
  - `LT_CONSOLE` - true or false.
@@ -70,5 +70,5 @@ Example:
 export LT_RESOLUTION="1920x1080"
 export LT_TEST_NAME="Test TestCafe"
 export LT_BUILD="Build x"
-testcafe lambdatest:safari,lambdatest:chrome tests/
+testcafe "lambdatest:Chrome","lambdatest:Chrome@74.0:Windows 8" tests/
 ```

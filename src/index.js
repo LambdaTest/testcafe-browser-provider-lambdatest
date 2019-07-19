@@ -39,8 +39,8 @@ export default {
     async openBrowser (id, pageUrl, browserName) {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
-        await _connect();
-        const capabilities = await _parseCapabilities(browserName);
+        await _connect(id);
+        const capabilities = await _parseCapabilities(id, browserName);
 
         await this._startBrowser(id, pageUrl, capabilities);
         const sessionUrl = ` ${AUTOMATION_DASHBOARD_URL}/logs/?sessionID=${this.openedBrowsers[id].sessionID} `;
@@ -51,6 +51,7 @@ export default {
     async closeBrowser (id) {
         await this.openedBrowsers[id].quit();
         delete this.openedBrowsers[id];
+        await _destroy(id);
     },
 
 
@@ -59,11 +60,6 @@ export default {
     async init () {
         this.browserNames = await _getBrowserList();
     },
-
-    async dispose () {
-        await _destroy();
-    },
-
     
     // Browser names handling
     async getBrowserList () {

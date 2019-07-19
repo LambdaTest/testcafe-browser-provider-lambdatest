@@ -13,7 +13,7 @@ const PROCESS_ENVIRONMENT = process.env;
 const BASE_URL = 'https://api.lambdatest.com/api/v1';
 const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
-let connectorInstance = null;
+const connectorInstance = { };
 
 async function requestApi (options) {
     const response = await request(options);
@@ -36,34 +36,41 @@ async function _getBrowserList () {
     }
     return browserList;
 }
-async function _connect () {
+async function _connect (id) {
     if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
         throw new Error(LT_AUTH_ERROR);
-    connectorInstance = new LambdaTestTunnel();
-    const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
-    const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
-    const tunnelArguments = {
-        user: PROCESS_ENVIRONMENT.LT_USERNAME,
-        
-        key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
-
-        logFile: logFile
-    };
     
-    if (v === 'true' || v === true) tunnelArguments.v = true;
-    if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-    if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-    if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-    if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-    if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
-    await connectorInstance.start(tunnelArguments);
+    const isRunning = connectorInstance[id] && connectorInstance[id].isRunning() || false;
+    
+    if (!isRunning) {
+        connectorInstance[id] = new LambdaTestTunnel();
+        const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
+        const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
+        const tunnelArguments = {
+            user: PROCESS_ENVIRONMENT.LT_USERNAME,
+            
+            key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+
+            logFile: logFile
+        };
+        
+        if (v === 'true' || v === true) tunnelArguments.v = true;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+        if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
+        if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
+        await connectorInstance[id].start(tunnelArguments);
+    }
 }
-async function _destroy () {
-    if (connectorInstance) await connectorInstance.stop();
-    connectorInstance = null;
+async function _destroy (id) {
+    if (connectorInstance[id]) {
+        await connectorInstance[id].stop();
+        delete connectorInstance[id];
+    }
 }
-async function _parseCapabilities (capability) {
+async function _parseCapabilities (id, capability) {
     const { browserName, browserVersion, platform } = parseCapabilities(capability)[0];
     let capabilities = {
         browserName: browserName,
@@ -74,7 +81,7 @@ async function _parseCapabilities (capability) {
 
         tunnel: true
     };
-    
+        
     if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
         let additionalCapabilities = { };
         
@@ -95,7 +102,7 @@ async function _parseCapabilities (capability) {
     if (PROCESS_ENVIRONMENT.LT_TEST_NAME) capabilities.name = PROCESS_ENVIRONMENT.LT_TEST_NAME;
     
     if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    else capabilities.tunnelName = await connectorInstance.getTunnelName();
+    else capabilities.tunnelName = await connectorInstance[id].getTunnelName();
     
     if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities.resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
     if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
@@ -104,6 +111,9 @@ async function _parseCapabilities (capability) {
     if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities.video = true;
     if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities.visual = true;
     if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities.timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
+    
+    if (capabilities.version === 'any') delete capabilities.version;
+    if (capabilities.platform === 'any') delete capabilities.platform;
     
     return capabilities;
 }

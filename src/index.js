@@ -25,7 +25,7 @@ export default {
             .get(url);
         }
         catch (err) {
-            await this.dispose();
+            await _destroy(id);
             throw err;
         }
     },
@@ -60,7 +60,7 @@ export default {
     async init () {
         this.browserNames = await _getBrowserList();
     },
-    
+
     // Browser names handling
     async getBrowserList () {
         return this.browserNames;
@@ -73,11 +73,15 @@ export default {
 
     // Extra methods
     async resizeWindow (id, width, height) {
-        await this.openedBrowsers[id].setWindowSize(width, height);
+        const _windowHandle = await this.openedBrowsers[id].windowHandle();
+        
+        await this.openedBrowsers[id].windowSize(_windowHandle, width, height);
     },
 
     async maximizeWindow (id) {
-        await this.openedBrowsers[id].maximize();
+        const _windowHandle = await this.openedBrowsers[id].windowHandle();
+        
+        await this.openedBrowsers[id].maximize(_windowHandle);
     },
 
     async takeScreenshot (id, screenshotPath) {

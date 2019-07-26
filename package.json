@@ -13,9 +13,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "gulp test",
-    "publish-please": "publish-please",
-    "prepublish": "publish-please guard"
+    "test": "gulp test"
   },
   "keywords": [
     "testcafe",
@@ -45,7 +43,6 @@
     "gulp-babel": "^6.1.2",
     "gulp-eslint": "^3.0.1",
     "gulp-mocha": "^3.0.1",
-    "node-version": "^1.0.0",
-    "publish-please": "^5.5.0"
+    "node-version": "^1.0.0"
   }
 }

@@ -4,11 +4,10 @@
   "description": "lambdatest TestCafe browser provider plugin.",
   "repository": "https://github.com/LambdaTest/testcafe-browser-provider-lambdatest",
   "homepage": "https://github.com/LambdaTest/testcafe-browser-provider-lambdatest",
-  "author": {
-    "name": "kanhaiya",
-    "email": "kanhaiyas@lambdatest.com",
-    "url": "https://www.lambdatest.com"
-  },
+  "author": "LambdaTest <keys@lambdatest.com>",
+  "contributors": [
+    "LambdaTest <keys@lambdatest.com> (https://www.npmjs.com/~lambdatestdev)"
+  ],
   "main": "lib/index",
   "files": [
     "lib"

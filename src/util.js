@@ -71,7 +71,10 @@ async function _destroy (id) {
     }
 }
 async function _parseCapabilities (id, capability) {
+    const testcafeDetail = require('../package.json');
+    
     const { browserName, browserVersion, platform } = parseCapabilities(capability)[0];
+    
     let capabilities = {
         browserName: browserName,
         
@@ -79,7 +82,9 @@ async function _parseCapabilities (id, capability) {
         
         platform: platform.toLowerCase(),
 
-        tunnel: true
+        tunnel: true,
+
+        plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
     };
         
     if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
@@ -99,7 +104,7 @@ async function _parseCapabilities (id, capability) {
     }
 
     if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities.build = PROCESS_ENVIRONMENT.LT_BUILD;
-    if (PROCESS_ENVIRONMENT.LT_TEST_NAME) capabilities.name = PROCESS_ENVIRONMENT.LT_TEST_NAME;
+    capabilities.name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
     
     if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
     else capabilities.tunnelName = await connectorInstance[id].getTunnelName();

@@ -1,7 +1,6 @@
 'use strict';
 import wd from 'wd';
-import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus } from './util';
-const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
+import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus } from './util';
 
 wd.configureHttp({
     timeout: 15 * 60000
@@ -15,7 +14,7 @@ export default {
     
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
-        const webDriver = wd.promiseChainRemote('hub.lambdatest.com', 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
+        const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
         
         this.openedBrowsers[id] = webDriver;
     

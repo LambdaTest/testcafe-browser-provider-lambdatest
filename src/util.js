@@ -10,10 +10,19 @@ const promisify = fn => pify(fn, Promise);
 const request   = promisify(_request, Promise);
 
 const PROCESS_ENVIRONMENT = process.env;
-const BASE_URL = 'https://api.lambdatest.com/api/v1';
-const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
+let BASE_URL = 'https://api.lambdatest.com/api/v1';
+let AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
+let AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
+let AUTOMATION_HUB_URL = 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 const connectorInstance = { };
+
+if (PROCESS_ENVIRONMENT.BETA_ENABLE) {
+    BASE_URL = 'https://beta-api.lambdatest.com/api/v1';
+    AUTOMATION_BASE_URL = 'https://beta-api.lambdatest.com/automation/api/v1';
+    AUTOMATION_DASHBOARD_URL = 'https://beta-automation.lambdatest.com';
+    AUTOMATION_HUB_URL = 'beta-hub.lambdatest.com';
+}
 
 async function requestApi (options) {
     const response = await request(options);
@@ -33,6 +42,15 @@ async function _getBrowserList () {
         const _browserList = await requestApi(`${BASE_URL}/capability?os=${os.id}&format=array`);
 
         for (const browser of _browserList) for (const version of browser.versions) browserList.push(`${browser.name}@${version.version}:${os.name}`);
+    }
+    const deviceList = await requestApi(`${BASE_URL}/device`);
+    
+    for (const key in deviceList) {
+        if (deviceList.hasOwnProperty(key)) {
+            const element = deviceList[key];
+            
+            for (const device of element) for (const osVersion of device.osVersion) browserList.push(`${device.deviceName}@${osVersion.version}:${key}`);
+        }
     }
     return browserList;
 }
@@ -75,18 +93,24 @@ async function _parseCapabilities (id, capability) {
     
     const { browserName, browserVersion, platform } = parseCapabilities(capability)[0];
     
+    const lPlatform = platform.toLowerCase();
+    
     let capabilities = {
-        browserName: browserName,
-        
-        version: browserVersion.toLowerCase(),
-        
-        platform: platform.toLowerCase(),
-
         tunnel: true,
 
         plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
     };
-        
+
+    if (['ios', 'android'].includes(lPlatform)) {
+        //capabilities.platformName = lPlatform;
+        capabilities.deviceName = browserName;
+        //capabilities.platformVersion = browserVersion;
+    }
+    else {
+        capabilities.browserName = browserName;
+        capabilities.version = browserVersion.toLowerCase();
+        capabilities.platform = lPlatform;
+    }
     if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
         let additionalCapabilities = { };
         
@@ -175,6 +199,8 @@ function _getAdditionalCapabilities (filename) {
 export default {
     LT_AUTH_ERROR,
     PROCESS_ENVIRONMENT,
+    AUTOMATION_DASHBOARD_URL,
+    AUTOMATION_HUB_URL,
     _connect,
     _destroy,
     _getBrowserList,

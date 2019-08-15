@@ -17,7 +17,7 @@ let AUTOMATION_HUB_URL = 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 const connectorInstance = { };
 
-if (PROCESS_ENVIRONMENT.BETA_ENABLE) {
+if (PROCESS_ENVIRONMENT.LT_BETA_ENABLE) {
     BASE_URL = 'https://beta-api.lambdatest.com/api/v1';
     AUTOMATION_BASE_URL = 'https://beta-api.lambdatest.com/automation/api/v1';
     AUTOMATION_DASHBOARD_URL = 'https://beta-automation.lambdatest.com';

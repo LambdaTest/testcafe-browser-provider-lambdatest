@@ -37,6 +37,13 @@ testCafe
     .run();
 ```
 
+##Build Plugin Locally
+
+    1. clone this repo
+    2. RUN: npm i
+    3. RUN: ./node_modules/.bin/gulp build
+    4. RUN: sudo npm link
+
 ## Configuration
 
 Use the following environment variables to set additional configuration options:

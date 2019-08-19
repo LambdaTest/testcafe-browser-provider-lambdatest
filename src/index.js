@@ -24,7 +24,7 @@ export default {
             .get(url);
         }
         catch (err) {
-            await _destroy(id);
+            await _destroy();
             throw err;
         }
     },
@@ -38,7 +38,6 @@ export default {
     async openBrowser (id, pageUrl, browserName) {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
-        await _connect(id);
         const capabilities = await _parseCapabilities(id, browserName);
 
         await this._startBrowser(id, pageUrl, capabilities);
@@ -47,10 +46,8 @@ export default {
         this.setUserAgentMetaInfo(id, sessionUrl);
     },
 
-    async closeBrowser (id) {
-        await this.openedBrowsers[id].quit();
-        delete this.openedBrowsers[id];
-        await _destroy(id);
+    async closeBrowser (/*id*/) {
+
     },
 
 
@@ -58,8 +55,12 @@ export default {
     // Initialization
     async init () {
         this.browserNames = await _getBrowserList();
+        await _connect();
     },
-
+    async dispose () {
+        for (const key in this.openedBrowsers) await this.openedBrowsers[key].quit();
+        await _destroy();
+    },
     // Browser names handling
     async getBrowserList () {
         return this.browserNames;

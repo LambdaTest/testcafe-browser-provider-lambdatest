@@ -15,8 +15,8 @@ let AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 let AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
 let AUTOMATION_HUB_URL = 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
-const connectorInstance = { };
-const tunnelArguments = { };
+let connectorInstance = null;
+let tunnelArguments = { };
 const capabilities = { };
 
 if (PROCESS_ENVIRONMENT.LT_BETA_ENABLE) {
@@ -56,18 +56,16 @@ async function _getBrowserList () {
     }
     return browserList;
 }
-async function _connect (id) {
+async function _connect () {
     if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
         throw new Error(LT_AUTH_ERROR);
     
-    const isRunning = connectorInstance[id] && connectorInstance[id].isRunning() || false;
-    
-    if (!isRunning) {
-        connectorInstance[id] = new LambdaTestTunnel();
+    if (!connectorInstance) {
+        connectorInstance = new LambdaTestTunnel();
         const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
         const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
         
-        tunnelArguments[id] = {
+        tunnelArguments = {
             user: PROCESS_ENVIRONMENT.LT_USERNAME,
             
             key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
@@ -75,21 +73,20 @@ async function _connect (id) {
             logFile: logFile
         };
         
-        if (v === 'true' || v === true) tunnelArguments[id].v = true;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments[id].proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments[id].proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments[id].proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments[id].proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-        tunnelArguments[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${id}`;
-        if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments[id].dir = PROCESS_ENVIRONMENT.LT_DIR;
-        await sleep(1000 * (Object.keys(connectorInstance).length + 1));
-        await connectorInstance[id].start(tunnelArguments[id]);
+        if (v === 'true' || v === true) tunnelArguments.v = true;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+        tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${(new Date()).getTime()}`;
+        if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
+        await connectorInstance.start(tunnelArguments);
     }
 }
-async function _destroy (id) {
-    if (connectorInstance[id]) {
-        await connectorInstance[id].stop();
-        delete connectorInstance[id];
+async function _destroy () {
+    if (connectorInstance) {
+        await connectorInstance.stop();
+        connectorInstance = null;
     }
 }
 async function _parseCapabilities (id, capability) {
@@ -135,7 +132,7 @@ async function _parseCapabilities (id, capability) {
     capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
     
     if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    else capabilities[id].tunnelName = tunnelArguments[id].tunnelName;
+    else capabilities[id].tunnelName = tunnelArguments.tunnelName;
     
     if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
     if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
@@ -200,11 +197,6 @@ function _getAdditionalCapabilities (filename) {
         );
     });
 }
-function sleep (ms) {
-    return new Promise(resolve => {
-        setTimeout(resolve, ms);
-    });
-}  
 export default {
     LT_AUTH_ERROR,
     PROCESS_ENVIRONMENT,

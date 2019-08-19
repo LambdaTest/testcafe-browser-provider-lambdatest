@@ -10,21 +10,14 @@ const promisify = fn => pify(fn, Promise);
 const request   = promisify(_request, Promise);
 
 const PROCESS_ENVIRONMENT = process.env;
-let BASE_URL = 'https://api.lambdatest.com/api/v1';
-let AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
-let AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
-let AUTOMATION_HUB_URL = 'hub.lambdatest.com';
+const BASE_URL = 'https://api.lambdatest.com/api/v1';
+const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
+const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
+const AUTOMATION_HUB_URL = 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 let connectorInstance = null;
 let tunnelArguments = { };
 const capabilities = { };
-
-if (PROCESS_ENVIRONMENT.LT_BETA_ENABLE) {
-    BASE_URL = 'https://beta-api.lambdatest.com/api/v1';
-    AUTOMATION_BASE_URL = 'https://beta-api.lambdatest.com/automation/api/v1';
-    AUTOMATION_DASHBOARD_URL = 'https://beta-automation.lambdatest.com';
-    AUTOMATION_HUB_URL = 'beta-hub.lambdatest.com';
-}
 
 async function requestApi (options) {
     const response = await request(options);

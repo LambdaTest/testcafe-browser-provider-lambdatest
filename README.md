@@ -18,11 +18,14 @@ testcafe -b lambdatest
 ```
 
 If you run tests from the command line, use the browser alias when specifying browsers:
-
+For Single Configuration
 ```
-testcafe "lambdatest:Chrome@74.0:Windows 8" 'path/to/test/file.js'
+testcafe "lambdatest:Chrome@74.0:Windows 8" "path/to/test/file.js"
 ```
-
+For Parallel/Multiple Configuration
+```
+testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "path/to/test/file.js"
+```
 
 When you use API, pass the alias to the `browsers()` method:
 

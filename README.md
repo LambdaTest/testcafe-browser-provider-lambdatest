@@ -37,7 +37,7 @@ testCafe
     .run();
 ```
 
-##Build Plugin Locally
+## Build Plugin Locally (Development Mode)
 
     1. clone this repo
     2. RUN: npm i

@@ -18,6 +18,8 @@ const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username
 let connectorInstance = null;
 let tunnelArguments = { };
 const capabilities = { };
+let retryCounter = 60;
+let isRunning = false;
 
 async function requestApi (options) {
     const response = await request(options);
@@ -49,10 +51,7 @@ async function _getBrowserList () {
     }
     return browserList;
 }
-async function _connect () {
-    if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
-        throw new Error(LT_AUTH_ERROR);
-    
+async function _connect () {    
     if (!connectorInstance) {
         connectorInstance = new LambdaTestTunnel();
         const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
@@ -74,6 +73,12 @@ async function _connect () {
         tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${(new Date()).getTime()}`;
         if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
         await connectorInstance.start(tunnelArguments);
+    }
+    while (!isRunning) {
+        await sleep(1000);
+        retryCounter--;
+        isRunning = await connectorInstance.isRunning();
+        if (retryCounter <= 0) isRunning = true;
     }
 }
 async function _destroy () {
@@ -125,7 +130,7 @@ async function _parseCapabilities (id, capability) {
     capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
     
     if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    else capabilities[id].tunnelName = tunnelArguments.tunnelName;
+    else capabilities[id].tunnelName = await connectorInstance.getTunnelName();
     
     if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
     if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
@@ -190,6 +195,12 @@ function _getAdditionalCapabilities (filename) {
         );
     });
 }
+function sleep (ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
+  
 export default {
     LT_AUTH_ERROR,
     PROCESS_ENVIRONMENT,

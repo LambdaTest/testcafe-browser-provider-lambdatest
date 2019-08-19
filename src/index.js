@@ -38,6 +38,7 @@ export default {
     async openBrowser (id, pageUrl, browserName) {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
+        await _connect();
         const capabilities = await _parseCapabilities(id, browserName);
 
         await this._startBrowser(id, pageUrl, capabilities);
@@ -55,7 +56,6 @@ export default {
     // Initialization
     async init () {
         this.browserNames = await _getBrowserList();
-        await _connect();
     },
     async dispose () {
         for (const key in this.openedBrowsers) await this.openedBrowsers[key].quit();

@@ -16,6 +16,8 @@ let AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
 let AUTOMATION_HUB_URL = 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 const connectorInstance = { };
+const tunnelArguments = { };
+const capabilities = { };
 
 if (PROCESS_ENVIRONMENT.LT_BETA_ENABLE) {
     BASE_URL = 'https://beta-api.lambdatest.com/api/v1';
@@ -64,7 +66,8 @@ async function _connect (id) {
         connectorInstance[id] = new LambdaTestTunnel();
         const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
         const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
-        const tunnelArguments = {
+        
+        tunnelArguments[id] = {
             user: PROCESS_ENVIRONMENT.LT_USERNAME,
             
             key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
@@ -72,14 +75,15 @@ async function _connect (id) {
             logFile: logFile
         };
         
-        if (v === 'true' || v === true) tunnelArguments.v = true;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-        if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-        if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
-        await connectorInstance[id].start(tunnelArguments);
+        if (v === 'true' || v === true) tunnelArguments[id].v = true;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments[id].proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments[id].proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments[id].proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+        if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments[id].proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+        tunnelArguments[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${id}`;
+        if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments[id].dir = PROCESS_ENVIRONMENT.LT_DIR;
+        await sleep(1000 * (Object.keys(connectorInstance).length + 1));
+        await connectorInstance[id].start(tunnelArguments[id]);
     }
 }
 async function _destroy (id) {
@@ -95,21 +99,21 @@ async function _parseCapabilities (id, capability) {
     
     const lPlatform = platform.toLowerCase();
     
-    let capabilities = {
+    capabilities[id] = {
         tunnel: true,
 
         plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
     };
 
     if (['ios', 'android'].includes(lPlatform)) {
-        //capabilities.platformName = lPlatform;
-        capabilities.deviceName = browserName;
-        //capabilities.platformVersion = browserVersion;
+        //capabilities[id].platformName = lPlatform;
+        capabilities[id].deviceName = browserName;
+        //capabilities[id].platformVersion = browserVersion;
     }
     else {
-        capabilities.browserName = browserName;
-        capabilities.version = browserVersion.toLowerCase();
-        capabilities.platform = lPlatform;
+        capabilities[id].browserName = browserName;
+        capabilities[id].version = browserVersion.toLowerCase();
+        capabilities[id].platform = lPlatform;
     }
     if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
         let additionalCapabilities = { };
@@ -121,30 +125,30 @@ async function _parseCapabilities (id, capability) {
         catch (err) {
             additionalCapabilities = { };
         }
-        capabilities = {
-            ...capabilities,
+        capabilities[id] = {
+            ...capabilities[id],
             ...additionalCapabilities[capability]
         };
     }
 
-    if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities.build = PROCESS_ENVIRONMENT.LT_BUILD;
-    capabilities.name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
+    if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
+    capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
     
-    if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    else capabilities.tunnelName = await connectorInstance[id].getTunnelName();
+    if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
+    else capabilities[id].tunnelName = tunnelArguments[id].tunnelName;
     
-    if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities.resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
-    if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
-    if (PROCESS_ENVIRONMENT.LT_CONSOLE) capabilities.console = true;
-    if (PROCESS_ENVIRONMENT.LT_NETWORK) capabilities.network = true;
-    if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities.video = true;
-    if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities.visual = true;
-    if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities.timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
+    if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
+    if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
+    if (PROCESS_ENVIRONMENT.LT_CONSOLE) capabilities[id].console = true;
+    if (PROCESS_ENVIRONMENT.LT_NETWORK) capabilities[id].network = true;
+    if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities[id].video = true;
+    if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities[id].visual = true;
+    if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities[id].timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
     
-    if (capabilities.version === 'any') delete capabilities.version;
-    if (capabilities.platform === 'any') delete capabilities.platform;
+    if (capabilities[id].version === 'any') delete capabilities[id].version;
+    if (capabilities[id].platform === 'any') delete capabilities[id].platform;
     
-    return capabilities;
+    return capabilities[id];
 }
 async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults) {
     const testsFailed = jobResult === possibleResults.done ? jobData.total - jobData.passed : 0;
@@ -196,6 +200,11 @@ function _getAdditionalCapabilities (filename) {
         );
     });
 }
+function sleep (ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}  
 export default {
     LT_AUTH_ERROR,
     PROCESS_ENVIRONMENT,

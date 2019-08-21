@@ -74,12 +74,7 @@ async function _connect () {
         if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
         await connectorInstance.start(tunnelArguments);
     }
-    while (!isRunning) {
-        await sleep(1000);
-        retryCounter--;
-        isRunning = await connectorInstance.isRunning();
-        if (retryCounter <= 0) isRunning = true;
-    }
+    await _waitForTunnelRunning();
 }
 async function _destroy () {
     if (connectorInstance) {
@@ -130,7 +125,17 @@ async function _parseCapabilities (id, capability) {
     capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
     
     if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    else capabilities[id].tunnelName = await connectorInstance.getTunnelName();
+    else {
+        const _isRunning = connectorInstance && await connectorInstance.isRunning();
+        
+        if (!_isRunning) {
+            await _destroy();
+            retryCounter = 60;
+            isRunning = false;
+            await _connect();
+        }
+        capabilities[id].tunnelName = await connectorInstance.getTunnelName();
+    }
     
     if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
     if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
@@ -180,6 +185,14 @@ async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults)
     };
     
     return await requestApi(options);
+}
+async function _waitForTunnelRunning () {
+    while (!isRunning) {
+        await sleep(1000);
+        retryCounter--;
+        isRunning = await connectorInstance.isRunning();
+        if (retryCounter <= 0) isRunning = true;
+    }
 }
 function _saveFile (screenshotPath, base64Data) {
     return new Promise((resolve, reject) => {

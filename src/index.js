@@ -2,8 +2,14 @@
 import wd from 'wd';
 import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus } from './util';
 
+const WEB_DRIVER_PING_INTERVAL = 5 * 60 * 1000;
+
 wd.configureHttp({
-    timeout: 15 * 60000
+    timeout: 9 * 60 * 1000,
+    
+    retries: 3,
+    
+    retryDelay: 30 * 1000
 });
 
 export default {
@@ -15,7 +21,11 @@ export default {
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
         const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
-        
+        const pingWebDriver = () => webDriver.eval('');
+
+        webDriver.once('status', () => {
+            webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
+        });
         this.openedBrowsers[id] = webDriver;
     
         try {
@@ -58,7 +68,10 @@ export default {
         this.browserNames = await _getBrowserList();
     },
     async dispose () {
-        for (const key in this.openedBrowsers) await this.openedBrowsers[key].quit();
+        for (const key in this.openedBrowsers) {
+            clearInterval(this.openedBrowsers[key].pingIntervalId);
+            await this.openedBrowsers[key].quit();
+        }
         await _destroy();
     },
     // Browser names handling

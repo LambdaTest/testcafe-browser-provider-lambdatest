@@ -51,30 +51,35 @@ async function _getBrowserList () {
     }
     return browserList;
 }
-async function _connect () {    
-    if (!connectorInstance) {
-        connectorInstance = new LambdaTestTunnel();
-        const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
-        const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
-        
-        tunnelArguments = {
-            user: PROCESS_ENVIRONMENT.LT_USERNAME,
+async function _connect () {
+    if (!PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) {
+        if (!connectorInstance) {
+            connectorInstance = new LambdaTestTunnel();
+            const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
+            const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
             
-            key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+            tunnelArguments = {
+                user: PROCESS_ENVIRONMENT.LT_USERNAME,
+                
+                key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+    
+                logFile: logFile,
 
-            logFile: logFile
-        };
-        
-        if (v === 'true' || v === true) tunnelArguments.v = true;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-        if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-        tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${(new Date()).getTime()}`;
-        if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
-        await connectorInstance.start(tunnelArguments);
-    }
-    await _waitForTunnelRunning();
+                controller: 'testcafe'
+            };
+            
+            if (v === 'true' || v === true) tunnelArguments.v = true;
+            if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+            if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+            if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+            if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+            tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${(new Date()).getTime()}`;
+            if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
+            await connectorInstance.start(tunnelArguments);
+        }
+        await _waitForTunnelRunning();
+    } 
+    
 }
 async function _destroy () {
     if (connectorInstance) {

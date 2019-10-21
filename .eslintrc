@@ -78,9 +78,11 @@
     "new-cap": ["error", { "capIsNew": false }],
     "space-before-function-paren": ["error", "always"],
     "no-use-before-define" : ["error", "nofunc"],
-    "handle-callback-err": "off"
+    "handle-callback-err": "off",
+    "require-atomic-updates": "off"
   },
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   }
 }

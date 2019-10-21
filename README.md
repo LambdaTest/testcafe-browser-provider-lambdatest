@@ -1,11 +1,12 @@
 # testcafe-browser-provider-lambdatest
+
 [![Build Status](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest.svg)](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest)
 
 This plugin integrates [TestCafe](http://devexpress.github.io/testcafe) with the [LambdaTest Testing Cloud](https://www.lambdatest.com/).
 
 ## Install
 
-```
+```sh
 npm install testcafe-browser-provider-lambdatest
 ```
 
@@ -13,17 +14,21 @@ npm install testcafe-browser-provider-lambdatest
 Before using this plugin, save the LambdaTest username and access key to environment variables `LT_USERNAME` and `LT_ACCESS_KEY`, as described in [LambdaTest Documentation](https://www.lambdatest.com/support/docs/using-environment-variables-for-authentication-credentials).
 
 You can determine the available browser aliases by running
-```
+
+```sh
 testcafe -b lambdatest
 ```
 
 If you run tests from the command line, use the browser alias when specifying browsers:
 For Single Configuration
-```
+
+```sh
 testcafe "lambdatest:Chrome@74.0:Windows 8" "path/to/test/file.js"
 ```
+
 For Parallel/Multiple Configuration
-```
+
+```sh
 testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "path/to/test/file.js"
 ```
 
@@ -39,10 +44,10 @@ testCafe
 
 ## Build Plugin Locally (Development Mode)
 
-    1. clone this repo
-    2. RUN: npm i
-    3. RUN: ./node_modules/.bin/gulp build
-    4. RUN: sudo npm link
+1. clone this repo
+2. RUN: npm i
+3. RUN: npm run build
+4. RUN: sudo npm link
 
 ## Configuration
 
@@ -51,7 +56,7 @@ Use the following environment variables to set additional configuration options:
  - `LT_TEST_NAME` - Test name on LambdaTest.
  - `LT_BUILD` - Build name on LambdaTest.
  - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON.
-    
+
     ```js
         "Chrome@63.0:Windows 8.1" : {
             "network" : true,
@@ -75,14 +80,20 @@ Use the following environment variables to set additional configuration options:
  - `LT_VIDEO` - true or false.
  - `LT_SCREENSHOT` - true or false.
  - `LT_TIMEZONE` - Configure tests to run on a custom time zone
- 
+
 Example:
+
 ```sh
 export LT_RESOLUTION="1920x1080"
 export LT_TEST_NAME="Test TestCafe"
 export LT_BUILD="Build x"
 testcafe "lambdatest:Chrome","lambdatest:Chrome@74.0:Windows 8" tests/
 ```
+
 ## About LambdaTest
 
 [LambdaTest](https://www.lambdatest.com/) is a cloud based selenium grid infrastructure that can help you run automated cross browser compatibility tests on 2000+ different browser and operating system environments. All test data generated during testing including Selenium command logs, screenshots generated in testing, video logs, selenium logs, network logs, console logs, and metadata logs can be extracted using [LambdaTest automation APIs](https://www.lambdatest.com/support/docs/api-doc/). This data can then be used for creating custom reports.
+
+## License
+
+Licensed under the [MIT license](./LICENSE).

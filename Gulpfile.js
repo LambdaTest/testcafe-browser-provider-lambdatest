@@ -10,11 +10,6 @@ gulp.task('clean', function () {
 });
 
 gulp.task('lint', function () {
-    // TODO: eslint supports node version 4 or higher.
-    // Remove this condition once we get rid of node 0.10 support.
-    if (nodeVersion.major === '0')
-        return null;
-
     var eslint = require('gulp-eslint');
 
     return gulp

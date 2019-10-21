@@ -49,7 +49,6 @@
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-eslint": "^6.0.0",
-    "gulp-mocha": "^7.0.2",
-    "node-version": "^2.0.0"
+    "gulp-mocha": "^7.0.2"
   }
 }

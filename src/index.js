@@ -30,8 +30,8 @@ export default {
     
         try {
             await webDriver
-            .init(capabilities)
-            .get(url);
+                .init(capabilities)
+                .get(url);
         }
         catch (err) {
             await _destroy();

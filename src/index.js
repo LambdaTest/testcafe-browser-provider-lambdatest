@@ -1,8 +1,10 @@
 'use strict';
 import wd from 'wd';
-import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus } from './util';
 
-const WEB_DRIVER_PING_INTERVAL = 5 * 60 * 1000;
+import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
+
+const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
+
 
 wd.configureHttp({
     timeout: 9 * 60 * 1000,
@@ -14,12 +16,14 @@ wd.configureHttp({
 
 export default {
     // Multiple browsers support
+
     isMultiBrowser: true,
-    
+
     browserNames: [],
     
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
+        showTrace('StartBrowser Initiated for ', id);
         const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
         const pingWebDriver = () => webDriver.eval('');
 
@@ -27,14 +31,17 @@ export default {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
         });
         this.openedBrowsers[id] = webDriver;
-    
+        showTrace(capabilities);
         try {
             await webDriver
                 .init(capabilities)
                 .get(url);
+
         }
         catch (err) {
             await _destroy();
+            showTrace('Error while starting browser for ', id);
+            showTrace(err);
             throw err;
         }
     },
@@ -57,10 +64,13 @@ export default {
         this.setUserAgentMetaInfo(id, sessionUrl);
     },
 
-    async closeBrowser (/*id*/) {
-
+    async closeBrowser (id) {
+        showTrace('closeBrowser Initiated for ', id);
+        if (this.openedBrowsers[id] && this.openedBrowsers[id].sessionID)
+            showTrace(this.openedBrowsers[id].sessionID);
+        else 
+            showTrace('Browser not found in OPEN STATE for ', id);
     },
-
 
     // Optional - implement methods you need, remove other methods
     // Initialization
@@ -68,11 +78,36 @@ export default {
         this.browserNames = await _getBrowserList();
     },
     async dispose () {
-        for (const key in this.openedBrowsers) {
-            clearInterval(this.openedBrowsers[key].pingIntervalId);
-            await this.openedBrowsers[key].quit();
+        showTrace('Dispose Initiated ...');
+        try { 
+            for (const key in this.openedBrowsers) {
+                clearInterval(this.openedBrowsers[key].pingIntervalId);
+                if (this.openedBrowsers[key].sessionID) {
+                    try {
+                        await this.openedBrowsers[key].quit();
+                    }
+                    catch (err) {
+                        showTrace(err);
+                    }
+                }
+                else {
+                    showTrace('SessionID not found for ', key);
+                    showTrace(this.openedBrowsers[key]);
+                }
+            }
         }
-        await _destroy();
+        catch (err) {
+            showTrace('Error while disposing ...');
+            showTrace(err);
+        }
+        try { 
+            await _destroy();
+        }
+        catch (err) {
+            showTrace('Error while destroying ...');
+            showTrace(err);
+        }
+        showTrace('Dispose Completed');
     },
     // Browser names handling
     async getBrowserList () {
@@ -104,7 +139,7 @@ export default {
     async reportJobResult (id, jobResult, jobData) {
         if (this.openedBrowsers[id] && this.openedBrowsers[id].sessionID) {
             const sessionID = this.openedBrowsers[id].sessionID;
-            
+
             return await _updateJobStatus(sessionID, jobResult, jobData, this.JOB_RESULT);
         }
         return null;

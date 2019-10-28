@@ -1,4 +1,4 @@
-# testcafe-browser-provider-lambdatest
+LT_TUNNEL_NAME# testcafe-browser-provider-lambdatest
 
 [![Build Status](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest.svg)](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest)
 
@@ -7,7 +7,7 @@ This plugin integrates [TestCafe](http://devexpress.github.io/testcafe) with the
 ## Install
 
 ```sh
-npm install testcafe-browser-provider-lambdatest
+$ npm install testcafe-browser-provider-lambdatest
 ```
 
 ## Usage
@@ -16,20 +16,20 @@ Before using this plugin, save the LambdaTest username and access key to environ
 You can determine the available browser aliases by running
 
 ```sh
-testcafe -b lambdatest
+$ testcafe -b lambdatest
 ```
 
 If you run tests from the command line, use the browser alias when specifying browsers:
 For Single Configuration
 
 ```sh
-testcafe "lambdatest:Chrome@74.0:Windows 8" "path/to/test/file.js"
+$ testcafe "lambdatest:Chrome@74.0:Windows 8" "path/to/test/file.js"
 ```
 
 For Parallel/Multiple Configuration
 
 ```sh
-testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "path/to/test/file.js"
+$ testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "path/to/test/file.js"
 ```
 
 When you use API, pass the alias to the `browsers()` method:
@@ -44,10 +44,25 @@ testCafe
 
 ## Build Plugin Locally (Development Mode)
 
-1. clone this repo
-2. RUN: npm i
-3. RUN: npm run build
-4. RUN: sudo npm link
+1.  Clone this repository,
+2.  Rename Project
+```sh
+$ mv testcafe-browser-provider-lambdatest lambdatest
+```
+3. Go to the project path
+```sh
+$ cd lambdatest
+```
+4. Install Packages and Build
+```sh
+$ npm i
+$ npm run build
+```
+5. Link Testcafe with lambdatest
+```sh
+$ sudo npm link
+```
+6. [See this for Credentials](#usage)
 
 ## Configuration
 
@@ -68,6 +83,7 @@ Use the following environment variables to set additional configuration options:
  - `LT_RESOLUTION` - allows setting the screen resolution for desktop browsers in the `${width}x${height}` format.
  - `LT_LOGFILE` - Logfile You can provide a specific path to this file. If you won't provide a path then the logs would be saved in your present working directory by the filename: tunnel.log.
  - `LT_VERBOSE` - true or false.
+ - `LT_ENABLE_TRACE` - true or false.
  - `LT_PROXY_HOST` - Hostname/IP of proxy, this is a mandatory value.
  - `LT_PROXY_PORT` - Port for the proxy, by default it would consider 3128 if proxyhost is used For Basic Authentication, we use the below proxy options.
  - `LT_PROXY_USER` - Username for connecting to proxy, mandatory value for using 'proxypass'.

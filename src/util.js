@@ -25,16 +25,33 @@ let retryCounter = 60;
 
 let isRunning = false;
 
+let isTraceEnable = false;
+
+if (PROCESS_ENVIRONMENT.LT_ENABLE_TRACE)
+    isTraceEnable = true;
+
 async function requestApi (options) {
     const response = await request(options);
 
     try {
-        return JSON.parse(response.body);
+        return IsJsonString(response.body);
     }
     catch (err) {
+        showTrace('API Response', response.body);
+        showTrace('Error while API call ', err);
         return null;
     }
 }
+
+function IsJsonString (str) {
+    try {
+        return JSON.parse(str);
+    } 
+    catch (e) {
+        return false;
+    }
+}
+
 async function _getBrowserList () {
     const browserList = [];
     const osList = await requestApi(`${BASE_URL}/capability?format=array`);
@@ -86,10 +103,16 @@ async function _connect () {
 
 }
 async function _destroy () {
-    if (connectorInstance) {
-        await connectorInstance.stop();
-        connectorInstance = null;
+    try {
+        if (connectorInstance) {
+            await connectorInstance.stop();
+            connectorInstance = null;
+        }
+    } 
+    catch (err) {
+        showTrace('util._destroy error :', err);
     }
+    
 }
 async function _parseCapabilities (id, capability) {
     const testcafeDetail = require('../package.json');
@@ -160,6 +183,8 @@ async function _parseCapabilities (id, capability) {
     return capabilities[id];
 }
 async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults) {
+    showTrace('Update Test Status called for ', sessionID);
+        
     const testsFailed = jobResult === possibleResults.done ? jobData.total - jobData.passed : 0;
     const jobPassed = jobResult === possibleResults.done && testsFailed === 0;
 
@@ -224,6 +249,16 @@ function sleep (ms) {
     });
 }
 
+function showTrace (message, data) {
+    /*eslint no-console: ["error", { allow: ["warn", "log", "error"] }] */
+    if (isTraceEnable) {
+        if (data) 
+            console.log(message, data);
+        else
+            console.log(message);
+    }
+}
+
 export default {
     LT_AUTH_ERROR,
     PROCESS_ENVIRONMENT,
@@ -234,5 +269,6 @@ export default {
     _getBrowserList,
     _parseCapabilities,
     _saveFile,
-    _updateJobStatus
+    _updateJobStatus,
+    showTrace
 };

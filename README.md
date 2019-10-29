@@ -1,4 +1,4 @@
-LT_TUNNEL_NAME# testcafe-browser-provider-lambdatest
+# testcafe-browser-provider-lambdatest
 
 [![Build Status](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest.svg)](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest)
 

@@ -105,6 +105,9 @@ async function _connect () {
 async function _destroy () {
     try {
         if (connectorInstance) {
+            const tunnelName = await connectorInstance.getTunnelName();
+            
+            showTrace('Stopping Tunnel :', tunnelName);
             await connectorInstance.stop();
             connectorInstance = null;
         }

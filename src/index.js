@@ -66,8 +66,22 @@ export default {
 
     async closeBrowser (id) {
         showTrace('closeBrowser Initiated for ', id);
-        if (this.openedBrowsers[id] && this.openedBrowsers[id].sessionID)
+        if (this.openedBrowsers[id]) {
             showTrace(this.openedBrowsers[id].sessionID);
+            clearInterval(this.openedBrowsers[id].pingIntervalId);
+            if (this.openedBrowsers[id].sessionID) {
+                try {
+                    await this.openedBrowsers[id].quit();
+                }
+                catch (err) {
+                    showTrace(err);
+                }
+            }
+            else {
+                showTrace('SessionID not found for ', id);
+                showTrace(this.openedBrowsers[id]);
+            }
+        } 
         else 
             showTrace('Browser not found in OPEN STATE for ', id);
     },
@@ -79,27 +93,6 @@ export default {
     },
     async dispose () {
         showTrace('Dispose Initiated ...');
-        try { 
-            for (const key in this.openedBrowsers) {
-                clearInterval(this.openedBrowsers[key].pingIntervalId);
-                if (this.openedBrowsers[key].sessionID) {
-                    try {
-                        await this.openedBrowsers[key].quit();
-                    }
-                    catch (err) {
-                        showTrace(err);
-                    }
-                }
-                else {
-                    showTrace('SessionID not found for ', key);
-                    showTrace(this.openedBrowsers[key]);
-                }
-            }
-        }
-        catch (err) {
-            showTrace('Error while disposing ...');
-            showTrace(err);
-        }
         try { 
             await _destroy();
         }

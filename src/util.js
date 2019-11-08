@@ -118,72 +118,80 @@ async function _destroy () {
     
 }
 async function _parseCapabilities (id, capability) {
-    const testcafeDetail = require('../package.json');
-
-    const { browserName, browserVersion, platform } = parseCapabilities(capability)[0];
-
-    const lPlatform = platform.toLowerCase();
-
-    capabilities[id] = {
-        tunnel: true,
-
-        plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
-    };
-
-    if (['ios', 'android'].includes(lPlatform)) {
-        //capabilities[id].platformName = lPlatform;
-        capabilities[id].deviceName = browserName;
-        //capabilities[id].platformVersion = browserVersion;
-    }
-    else {
-        capabilities[id].browserName = browserName;
-        capabilities[id].version = browserVersion.toLowerCase();
-        capabilities[id].platform = lPlatform;
-    }
-    if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
-        let additionalCapabilities = { };
-
-        try {
-            additionalCapabilities = await _getAdditionalCapabilities(PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH);
-
-        }
-        catch (err) {
-            additionalCapabilities = { };
-        }
+    try {
+        const testcafeDetail = require('../package.json');
+        const parseCapabilitiesData = parseCapabilities(capability)[0];
+        const browserName = parseCapabilitiesData.browserName;
+        const browserVersion = parseCapabilitiesData.browserVersion;
+        const platform = parseCapabilitiesData.platform;
+        const lPlatform = platform.toLowerCase();
+        
         capabilities[id] = {
-            ...capabilities[id],
-            ...additionalCapabilities[capability]
+            tunnel: true,
+
+            plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
         };
-    }
-
-    if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
-    capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
-
-    if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-    else {
-        const _isRunning = connectorInstance && await connectorInstance.isRunning();
-
-        if (!_isRunning) {
-            await _destroy();
-            retryCounter = 60;
-            isRunning = false;
-            await _connect();
+        if (['ios', 'android'].includes(lPlatform)) {
+            //capabilities[id].platformName = lPlatform;
+            capabilities[id].deviceName = browserName;
+            //capabilities[id].platformVersion = browserVersion;
         }
-        capabilities[id].tunnelName = await connectorInstance.getTunnelName();
+        else {
+            capabilities[id].browserName = browserName;
+            capabilities[id].version = browserVersion.toLowerCase();
+            capabilities[id].platform = lPlatform;
+        }
+        if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
+            let additionalCapabilities = { };
+
+            try {
+                additionalCapabilities = await _getAdditionalCapabilities(PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH);
+
+            }
+            catch (err) {
+                additionalCapabilities = { };
+            }
+            capabilities[id] = {
+                ...capabilities[id],
+                ...additionalCapabilities[capability]
+            };
+        }
+
+        if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
+        capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
+
+        if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
+        else {
+            const _isRunning = connectorInstance && await connectorInstance.isRunning();
+            
+            if (!_isRunning) {
+                await _destroy();
+                retryCounter = 60;
+                isRunning = false;
+                await _connect();
+            }
+            capabilities[id].tunnelName = await connectorInstance.getTunnelName();
+        }
+
+        if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
+        if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
+        if (PROCESS_ENVIRONMENT.LT_CONSOLE) capabilities[id].console = true;
+        if (PROCESS_ENVIRONMENT.LT_NETWORK) capabilities[id].network = true;
+        if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities[id].video = true;
+        if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities[id].visual = true;
+        if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities[id].timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
+
+        if (capabilities[id].version === 'any') delete capabilities[id].version;
+        if (capabilities[id].platform === 'any') delete capabilities[id].platform;
+
+        showTrace('Parsed Capabilities ', capabilities[id]);
+
+        return capabilities[id];
     }
-
-    if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
-    if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
-    if (PROCESS_ENVIRONMENT.LT_CONSOLE) capabilities[id].console = true;
-    if (PROCESS_ENVIRONMENT.LT_NETWORK) capabilities[id].network = true;
-    if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities[id].video = true;
-    if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities[id].visual = true;
-    if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities[id].timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
-
-    if (capabilities[id].version === 'any') delete capabilities[id].version;
-    if (capabilities[id].platform === 'any') delete capabilities[id].platform;
-
-    return capabilities[id];
+    catch (err) {
+        showTrace('util._parseCapabilities error :', err);
+        return err;
+    }
 }
 async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults) {
     showTrace('Update Test Status called for ', sessionID);

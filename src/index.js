@@ -7,7 +7,9 @@ const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
 
 wd.configureHttp({
-    timeout: 9 * 60 * 1000
+    timeout: 9 * 60 * 1000,
+    
+    retries: -1,
 });
 
 export default {

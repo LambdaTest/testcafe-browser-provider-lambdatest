@@ -33,7 +33,7 @@
     "pify": "^4.0.1",
     "pinkie": "^2.0.4",
     "request": "^2.88.0",
-    "wd": "^1.11.4"
+    "selenium-webdriver": "^4.0.0-alpha.5"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

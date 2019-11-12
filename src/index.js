@@ -1,16 +1,6 @@
 'use strict';
-import wd from 'wd';
-
+import wd from 'selenium-webdriver';
 import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
-
-const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
-
-
-wd.configureHttp({
-    timeout: 9 * 60 * 1000,
-    
-    retries: -1,
-});
 
 export default {
     // Multiple browsers support
@@ -20,21 +10,22 @@ export default {
     browserNames: [],
     
     openedBrowsers: { },
-    async _startBrowser (id, url, capabilities) {
+    async _startBrowser (id, pageUrl, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
-        const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
-        const pingWebDriver = () => webDriver.eval('');
-
-        webDriver.once('status', () => {
-            webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
-        });
-        this.openedBrowsers[id] = webDriver;
-        showTrace(capabilities);
         try {
-            await webDriver
-                .init(capabilities)
-                .get(url);
+            const gridURL = `https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}${AUTOMATION_HUB_URL}`;
+            const webDriver = new wd.Builder()
+                .usingServer(gridURL)
+                .withCapabilities(capabilities)
+                .build();
+            
+            await webDriver.get(pageUrl);
+            await webDriver.getSession().then((session) => {
+                showTrace('StartBrowser webDriver.getSession() ', session);
+                webDriver.sessionID = session.id_;
+            });
 
+            this.openedBrowsers[id] = webDriver;
         }
         catch (err) {
             await _destroy();
@@ -42,11 +33,6 @@ export default {
             showTrace(err);
             throw err;
         }
-    },
-    async _takeScreenshot (id, screenshotPath) {
-        const base64Data = await this.openedBrowsers[id].takeScreenshot();
-        
-        await _saveFile(screenshotPath, base64Data);
     },
     // Required - must be implemented
     // Browser control
@@ -66,7 +52,6 @@ export default {
         showTrace('closeBrowser Initiated for ', id);
         if (this.openedBrowsers[id]) {
             showTrace(this.openedBrowsers[id].sessionID);
-            clearInterval(this.openedBrowsers[id].pingIntervalId);
             if (this.openedBrowsers[id].sessionID) {
                 try {
                     await this.openedBrowsers[id].quit();
@@ -79,9 +64,8 @@ export default {
                 showTrace('SessionID not found for ', id);
                 showTrace(this.openedBrowsers[id]);
             }
-        } 
-        else 
-            showTrace('Browser not found in OPEN STATE for ', id);
+        }
+        else showTrace('Browser not found in OPEN STATE for ', id);
     },
 
     // Optional - implement methods you need, remove other methods
@@ -112,19 +96,17 @@ export default {
 
     // Extra methods
     async resizeWindow (id, width, height) {
-        const _windowHandle = await this.openedBrowsers[id].windowHandle();
-        
-        await this.openedBrowsers[id].windowSize(_windowHandle, width, height);
+        await this.openedBrowsers[id].manage().window().setSize(width, height);
     },
 
     async maximizeWindow (id) {
-        const _windowHandle = await this.openedBrowsers[id].windowHandle();
-        
-        await this.openedBrowsers[id].maximize(_windowHandle);
+        await this.openedBrowsers[id].manage().window().maximize();
     },
 
     async takeScreenshot (id, screenshotPath) {
-        await this._takeScreenshot(id, screenshotPath);
+        const base64Data = await this.openedBrowsers[id].takeScreenshot();
+        
+        await _saveFile(screenshotPath, base64Data);
     },
     
     async reportJobResult (id, jobResult, jobData) {

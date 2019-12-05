@@ -13,7 +13,8 @@ export default {
     async _startBrowser (id, pageUrl, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
         try {
-            const gridURL = `https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}${AUTOMATION_HUB_URL}`;
+            const protocal = [true, 'true'].includes(PROCESS_ENVIRONMENT.LT_HTTPS) ? 'https' : 'http';
+            const gridURL = `${protocal}://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}${AUTOMATION_HUB_URL}`;
             const webDriver = new wd.Builder()
                 .usingServer(gridURL)
                 .withCapabilities(capabilities)

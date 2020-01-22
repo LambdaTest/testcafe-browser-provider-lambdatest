@@ -13,7 +13,7 @@ const PROCESS_ENVIRONMENT = process.env;
 const BASE_URL = 'https://api.lambdatest.com/api/v1';
 const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
-const AUTOMATION_HUB_URL = 'hub.lambdatest.com';
+const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 
 let connectorInstance = null;

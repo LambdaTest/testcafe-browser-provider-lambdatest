@@ -83,6 +83,7 @@ Use the following environment variables to set additional configuration options:
  - `LT_RESOLUTION` - allows setting the screen resolution for desktop browsers in the `${width}x${height}` format.
  - `LT_LOGFILE` - Logfile You can provide a specific path to this file. If you won't provide a path then the logs would be saved in your present working directory by the filename: tunnel.log.
  - `LT_VERBOSE` - true or false.
+ - `LT_W3C` - true or false.
  - `LT_ENABLE_TRACE` - true or false.
  - `LT_PROXY_HOST` - Hostname/IP of proxy, this is a mandatory value.
  - `LT_PROXY_PORT` - Port for the proxy, by default it would consider 3128 if proxyhost is used For Basic Authentication, we use the below proxy options.

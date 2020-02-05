@@ -180,6 +180,7 @@ async function _parseCapabilities (id, capability) {
         if (PROCESS_ENVIRONMENT.LT_VIDEO) capabilities[id].video = true;
         if (PROCESS_ENVIRONMENT.LT_SCREENSHOT) capabilities[id].visual = true;
         if (PROCESS_ENVIRONMENT.LT_TIMEZONE) capabilities[id].timezone = PROCESS_ENVIRONMENT.LT_TIMEZONE;
+        if (PROCESS_ENVIRONMENT.LT_W3C === true || PROCESS_ENVIRONMENT.LT_W3C === 'true') capabilities[id].w3c = true;
 
         if (capabilities[id].version === 'any') delete capabilities[id].version;
         if (capabilities[id].platform === 'any') delete capabilities[id].platform;

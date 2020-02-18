@@ -58,6 +58,7 @@ export default {
         
         if (capabilities instanceof Error) {
             showTrace('openBrowser error on  _parseCapabilities', capabilities);
+            await this.dispose()
             throw capabilities;
         }
         await this._startBrowser(id, pageUrl, capabilities);

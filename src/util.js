@@ -73,34 +73,38 @@ async function _getBrowserList () {
     return browserList;
 }
 async function _connect () {
-    if (!PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) {
-        if (!connectorInstance) {
-            connectorInstance = new LambdaTestTunnel();
-            const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
-            const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
+    try {
+        if (!PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) {
+            if (!connectorInstance) {
+                connectorInstance = new LambdaTestTunnel();
+                const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
+                const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
 
-            tunnelArguments = {
-                user: PROCESS_ENVIRONMENT.LT_USERNAME,
+                tunnelArguments = {
+                    user: PROCESS_ENVIRONMENT.LT_USERNAME,
 
-                key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+                    key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
 
-                logFile: logFile,
+                    logFile: logFile,
 
-                controller: 'testcafe'
-            };
+                    controller: 'testcafe'
+                };
 
-            if (v === 'true' || v === true) tunnelArguments.v = true;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-            tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${new Date().getTime()}`;
-            if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
-            await connectorInstance.start(tunnelArguments);
+                if (v === 'true' || v === true) tunnelArguments.v = true;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_USER) tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+                tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${new Date().getTime()}`;
+                if (PROCESS_ENVIRONMENT.LT_DIR) tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
+                await connectorInstance.start(tunnelArguments);
+            }
+            await _waitForTunnelRunning();
         }
-        await _waitForTunnelRunning();
     }
-
+    catch (err) {
+        showTrace('_connect error :', err);
+    }
 }
 async function _destroy () {
     try {
@@ -162,15 +166,21 @@ async function _parseCapabilities (id, capability) {
 
         if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
         else {
-            const _isRunning = connectorInstance && await connectorInstance.isRunning();
+            try {
+                const _isRunning = connectorInstance && await connectorInstance.isRunning();
             
-            if (!_isRunning) {
-                await _destroy();
-                retryCounter = 60;
-                isRunning = false;
-                await _connect();
+                if (!_isRunning) {
+                    await _destroy();
+                    retryCounter = 60;
+                    isRunning = false;
+                    await _connect();
+                }
+                capabilities[id].tunnelName = await connectorInstance.getTunnelName();
             }
-            capabilities[id].tunnelName = await connectorInstance.getTunnelName();
+            catch (err) {
+                showTrace('_parseCapabilities Error on isRunning check error :', err);
+                return new Error(err);
+            }
         }
 
         if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
@@ -191,7 +201,7 @@ async function _parseCapabilities (id, capability) {
     }
     catch (err) {
         showTrace('util._parseCapabilities error :', err);
-        return err;
+        return new Error(err);
     }
 }
 async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults) {
@@ -264,10 +274,9 @@ function sleep (ms) {
 function showTrace (message, data) {
     /*eslint no-console: ["error", { allow: ["warn", "log", "error"] }] */
     if (isTraceEnable) {
-        if (data) 
-            console.log(message, data);
-        else
-            console.log(message);
+        console.log(message);
+        if (data)
+            console.log(data);
     }
 }
 

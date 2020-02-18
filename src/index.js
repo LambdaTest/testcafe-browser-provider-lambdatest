@@ -55,7 +55,11 @@ export default {
             throw new Error(LT_AUTH_ERROR);
         await _connect();
         const capabilities = await _parseCapabilities(id, browserName);
-
+        
+        if (capabilities instanceof Error) {
+            showTrace('openBrowser error on  _parseCapabilities', capabilities);
+            throw capabilities;
+        }
         await this._startBrowser(id, pageUrl, capabilities);
         const sessionUrl = ` ${AUTOMATION_DASHBOARD_URL}/logs/?sessionID=${this.openedBrowsers[id].sessionID} `;
         

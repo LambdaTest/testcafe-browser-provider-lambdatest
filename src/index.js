@@ -23,7 +23,7 @@ export default {
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
         const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
-        const pingWebDriver = () => webDriver.safeExecute('ping', handleError);
+        const pingWebDriver = () => webDriver.safeExecute('ignore-testcafe-ping', handleError);
         
         webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);

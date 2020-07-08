@@ -3,7 +3,7 @@ import wd from 'wd';
 
 import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
 
-const WEB_DRIVER_PING_INTERVAL = 5 * 1000;
+const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
 
 wd.configureHttp({
@@ -142,20 +142,17 @@ export default {
     }
 };
 
-function handleError (err, res) {
+function handlePingError (err, res) {
     if (err) {
-        showTrace('HANDLE ERROR');
+        showTrace('ping error :');
         showTrace(err);
+    } 
+    else {
+        showTrace('ignore ping response :');
+        showTrace(res);
     }
-    showTrace(res);
 }
 
 function ping (webDriver) {
-    try {
-        webDriver.safeExecute('ignore-testcafe-ping', handleError);
-    }
-    catch (err) {
-        showTrace('PING ERROR');
-        showTrace(err);
-    }
+    webDriver.safeExecute(1, handlePingError);
 }

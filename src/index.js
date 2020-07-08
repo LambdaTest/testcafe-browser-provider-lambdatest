@@ -7,7 +7,7 @@ const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
 
 wd.configureHttp({
-    timeout: 9 * 60 * 1000,
+    timeout: 15 * 60 * 1000,
     
     retries: -1,
 });
@@ -23,7 +23,7 @@ export default {
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
         const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
-        const pingWebDriver = () => webDriver.safeExecute('ignore-testcafe-ping', handleError);
+        const pingWebDriver = () => ping(webDriver);
         
         webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
@@ -142,8 +142,17 @@ export default {
     }
 };
 
-function handleError (err) {
-    if (err)
-        return showTrace(err);
-    return null;
+function handlePingError (err, res) {
+    if (err) {
+        showTrace('ping error :');
+        showTrace(err);
+    } 
+    else {
+        showTrace('ignore ping response :');
+        showTrace(res);
+    }
+}
+
+function ping (webDriver) {
+    webDriver.safeExecute(1, handlePingError);
 }

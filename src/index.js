@@ -142,20 +142,23 @@ export default {
     }
 };
 
-function handleError (err, res) {
+function handlePingError (err, res) {
     if (err) {
-        showTrace('HANDLE ERROR');
+        showTrace('handlePingError :');
         showTrace(err);
+    } 
+    else {
+        showTrace('ping response :');
+        showTrace(res);
     }
-    showTrace(res);
 }
 
 function ping (webDriver) {
     try {
-        webDriver.safeExecute('ignore-testcafe-ping', handleError);
+        webDriver.eval('', handlePingError).done();
     }
     catch (err) {
-        showTrace('PING ERROR');
+        showTrace('ping error :');
         showTrace(err);
     }
 }

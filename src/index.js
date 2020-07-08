@@ -3,11 +3,11 @@ import wd from 'wd';
 
 import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
 
-const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
+const WEB_DRIVER_PING_INTERVAL = 5 * 1000;
 
 
 wd.configureHttp({
-    timeout: 9 * 60 * 1000,
+    timeout: 15 * 60 * 1000,
     
     retries: -1,
 });
@@ -23,7 +23,7 @@ export default {
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
         const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
-        const pingWebDriver = () => webDriver.safeExecute('ignore-testcafe-ping', handleError);
+        const pingWebDriver = () => ping(webDriver);
         
         webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
@@ -142,8 +142,20 @@ export default {
     }
 };
 
-function handleError (err) {
-    if (err)
-        return showTrace(err);
-    return null;
+function handleError (err, res) {
+    if (err) {
+        showTrace('HANDLE ERROR');
+        showTrace(err);
+    }
+    showTrace(res);
+}
+
+function ping (webDriver) {
+    try {
+        webDriver.safeExecute('ignore-testcafe-ping', handleError);
+    }
+    catch (err) {
+        showTrace('PING ERROR');
+        showTrace(err);
+    }
 }

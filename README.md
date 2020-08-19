@@ -70,14 +70,16 @@ Use the following environment variables to set additional configuration options:
 
  - `LT_TEST_NAME` - Test name on LambdaTest.
  - `LT_BUILD` - Build name on LambdaTest.
- - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON.
+ - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON file (eg. config.json)
 
     ```js
-        "Chrome@63.0:Windows 8.1" : {
-            "network" : true,
-            "visual" : true,
-            "timezone" : "UTC+11:00"
+    {
+        "Chrome@63.0:Windows 8.1": {
+            "network": true,
+            "visual": true,
+            "timezone": "UTC+11:00"
         }
+    }
     ```
     - `Chrome@63.0:Windows 8.1` is browser alias.
  - `LT_RESOLUTION` - allows setting the screen resolution for desktop browsers in the `${width}x${height}` format.

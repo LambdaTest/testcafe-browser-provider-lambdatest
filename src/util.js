@@ -153,6 +153,7 @@ async function _parseCapabilities (id, capability) {
 
             }
             catch (err) {
+                showTrace('Error while adding additionalCapabilities from file : ' + PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH + '  ErrorTrace :', err);
                 additionalCapabilities = { };
             }
             capabilities[id] = {
@@ -194,7 +195,9 @@ async function _parseCapabilities (id, capability) {
 
         if (capabilities[id].version === 'any') delete capabilities[id].version;
         if (capabilities[id].platform === 'any') delete capabilities[id].platform;
-
+        if (PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === true || PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === 'true') capabilities[id]['safari.cookies'] = true;
+        if (PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === true || PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === 'true') capabilities[id]['safari.popups'] = true;
+        
         showTrace('Parsed Capabilities ', capabilities[id]);
 
         return capabilities[id];

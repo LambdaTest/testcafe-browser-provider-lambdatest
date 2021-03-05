@@ -136,9 +136,9 @@ async function _parseCapabilities (id, capability) {
             plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
         };
         if (['ios', 'android'].includes(lPlatform)) {
-            //capabilities[id].platformName = lPlatform;
+            capabilities[id].platformName = lPlatform;
             capabilities[id].deviceName = browserName;
-            //capabilities[id].platformVersion = browserVersion;
+            capabilities[id].platformVersion = browserVersion;
         }
         else {
             capabilities[id].browserName = browserName;

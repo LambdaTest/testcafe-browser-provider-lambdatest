@@ -168,15 +168,36 @@ async function _parseCapabilities (id, capability) {
         if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
         else {
             try {
-                const _isRunning = connectorInstance && await connectorInstance.isRunning();
-            
-                if (!_isRunning) {
-                    await _destroy();
-                    retryCounter = 60;
-                    isRunning = false;
-                    await _connect();
+                showTrace('ConncetorInstance Data: ', connectorInstance);
+
+                try {
+                    const _isRunning = connectorInstance && await connectorInstance.isRunning();
+
+                    try {
+                        if (!_isRunning) {
+                            await _destroy();
+                            retryCounter = 60;
+                            isRunning = false;
+                            await _connect();
+                        }
+                    }
+                    catch (err) {
+                        showTrace('connectorInstance _isRunning failing at if condition:', err);
+                        return new Error(err);
+                    }
                 }
-                capabilities[id].tunnelName = await connectorInstance.getTunnelName();
+                catch (err) {
+                    showTrace('connectorInstance isRunning method error :', err);
+                    return new Error(err);
+                }
+            
+                try {
+                    capabilities[id].tunnelName = connectorInstance && await connectorInstance.getTunnelName();
+                }
+                catch (err) {
+                    showTrace('connectorInstance getTunnelName method error :', err);
+                    return new Error(err);
+                }
             }
             catch (err) {
                 showTrace('_parseCapabilities Error on isRunning check error :', err);

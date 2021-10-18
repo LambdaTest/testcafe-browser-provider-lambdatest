@@ -169,6 +169,7 @@ async function _parseCapabilities (id, capability) {
         else {
             try {
                 const _isRunning = connectorInstance && await connectorInstance.isRunning();
+                
                 if (!_isRunning) {
                     await _destroy();
                     retryCounter = 60;

@@ -1,0 +1,55 @@
+(node:55030) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added to [BrowserSet]. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+It's seems you have older version of @lambdatest/node-tunnel.For better experience , please update using: 
+npm update @lambdatest/node-tunnel
+Verifying credentials
+Auth succeeded
+Checking for updates
+Binary already at latest version
+Starting tunnel
+Tunnel successfully initiated. You can start testing now
+ Running tests in:
+ - Safari 13.1.2 / macOS 10.15.6 (
+ https://automation.lambdatest.com/logs/?sessionID=AB8DD483-A6CF-4117-9F4D-B265CE99F01E
+ )
+ - Chrome 89.0.4389.40 / Windows 10 (
+ https://automation.lambdatest.com/logs/?sessionID=29c9549dbc03296553dcb01081a0df4d
+ )
+ - Chrome 88.0.4324.104 / Windows 10 (
+ https://automation.lambdatest.com/logs/?sessionID=c1b97ba6422fe80b1d89e92d89dee796
+ )
+ - Microsoft Edge 94.0.992.14 / Windows 10 (
+ https://automation.lambdatest.com/logs/?sessionID=81dc20db61eea2c892c3ce39eedbec78
+ )
+ - Firefox 92.0 / Windows 10 (
+ https://automation.lambdatest.com/logs/?sessionID=00471f6f-aebd-4f62-bd35-7fd8b2c728d7
+ )
+ - Firefox 91.0 / Windows 10 (
+ https://automation.lambdatest.com/logs/?sessionID=dfa48632-38e3-4eac-a0e9-6befa9bbdfc5
+ )
+ - Firefox 90.0 / Windows 10 (
+ https://automation.lambdatest.com/logs/?sessionID=8e17b65e-cb2a-4744-b394-06a49cf661ec
+ )
+ - Chrome 93.0.4577.63 / macOS 10.15.7 (
+ https://automation.lambdatest.com/logs/?sessionID=c199513fae60239bebddc6968d5201e5
+ )
+ - Chrome 92.0.4515.107 / macOS 10.15.7 (
+ https://automation.lambdatest.com/logs/?sessionID=62850092fc8900832b0524919a26861e
+ )
+ - Safari 14.1.2 / macOS 10.15.7 (
+ https://automation.lambdatest.com/logs/?sessionID=29AEB754-DE92-46CC-BE51-C8D98F27DDBD
+ )
+
+ A set of examples that illustrate how to use TestCafe API
+ ✓ Text typing basics
+ ✓ Click an array of labels and then check their states
+ ✓ Dealing with text using keyboard
+ ✓ Moving the slider
+ ✓ Dealing with text using selection
+ ✓ Handle native confirmation dialog
+ ✓ Pick option from select
+ ✓ Filling a form
+
+
+ 8 passed (1m 06s)

@@ -5,6 +5,7 @@ import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATIO
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
+const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER;
 
 wd.configureHttp({
     timeout: 15 * 60 * 1000,
@@ -41,7 +42,7 @@ export default {
 
         }
         catch (err) {
-            for (let tunnel = 0; tunnel < 5; tunnel++) await _destroy(tunnel);
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
 
             showTrace('Error while starting browser for ', id);
             showTrace(err);
@@ -59,14 +60,14 @@ export default {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
 
-        for (let tunnel = 0; tunnel < 5; tunnel++) await _connect(tunnel);
+        for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _connect(tunnel);
 
         const capabilities = await _parseCapabilities(id, browserName);
         
         if (capabilities instanceof Error) {
             showTrace('openBrowser error on  _parseCapabilities', capabilities);
 
-            for (let tunnel = 0; tunnel < 5; tunnel++) await _destroy(tunnel);
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
 
             throw capabilities;
         }
@@ -108,7 +109,7 @@ export default {
     async dispose () {
         showTrace('Dispose Initiated ...');
         try { 
-            for (let tunnel = 0; tunnel < 5; tunnel++) await _destroy(tunnel);
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
 
         }
         catch (err) {

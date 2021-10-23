@@ -15,6 +15,7 @@ const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
 const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
+const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER || 5;
 
 var instances = [];
 
@@ -22,7 +23,7 @@ var instancesArgs = [];
 
 var instanceRunning = [];
 
-for (let tunnel = 0; tunnel < 5; tunnel++) {
+for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
     instances.push(null);
     instancesArgs.push({});
     instanceRunning.push(false);
@@ -99,7 +100,7 @@ async function _connect (tunnel) {
                 // connectorInstance = new LambdaTestTunnel();
                 // secondConnectorInstance = new LambdaTestTunnel();
                 const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
-                // const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
+                const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
 
                 instancesArgs[tunnel] = {
                     user: PROCESS_ENVIRONMENT.LT_USERNAME,
@@ -250,7 +251,7 @@ async function _parseCapabilities (id, capability) {
 
                 try {
 
-                    for (let tunnel = 0; tunnel < 5; tunnel++) {
+                    for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
                         const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
 
                         if (!_isRunning) {
@@ -284,7 +285,7 @@ async function _parseCapabilities (id, capability) {
                     showTrace('connectorInstance isRunning method error :', err);
                     return new Error(err);
                 }
-                var rand = getRandomInt(5);
+                var rand = getRandomInt(LT_TUNNEL_NUMBER);
 
                 console.log(instances[rand]);
 

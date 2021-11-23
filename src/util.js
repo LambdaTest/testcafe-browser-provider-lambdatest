@@ -15,7 +15,7 @@ const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
 const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
-const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER || 5;
+const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER || 1;
 
 var instances = [];
 
@@ -162,7 +162,7 @@ async function _connect (tunnel) {
 async function _destroy (tunnel) {
     try {
         if (instances[tunnel]) {
-            const tunnelName = await instances[tunnel].options.tunnelName;
+            const tunnelName = await instances[tunnel]?.options.tunnelName;
 
             showTrace('Stopping Tunnel :', tunnelName);
 
@@ -286,7 +286,7 @@ async function _parseCapabilities (id, capability) {
             }
             var rand = getRandomInt(LT_TUNNEL_NUMBER);
 
-            capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
+            capabilities[id].tunnelName = instances[rand] && instances[rand]?.options.tunnelName;
 
             // if (rand === 0) capabilities[id].tunnelName = secondConnectorInstance && await secondConnectorInstance.getTunnelName();
             // else capabilities[id].tunnelName = connectorInstance && await connectorInstance.getTunnelName();

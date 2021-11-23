@@ -1,11 +1,9 @@
 'use strict';
 import wd from 'wd';
 
-import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
+import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace, LT_TUNNEL_NUMBER } from './util';
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
-
-const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER;
 
 wd.configureHttp({
     timeout: 15 * 60 * 1000,

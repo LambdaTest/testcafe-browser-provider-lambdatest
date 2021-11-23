@@ -111,7 +111,7 @@ async function _connect (tunnel) {
                 controller: 'testcafe'
             };
 
-            if (process.env.LT_TUNNEL_NAME.length > 0) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
+            if (process.env.LT_TUNNEL_NAME) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
             else instancesArgs[tunnel].tunnelName = 'TestCafe' + tunnel + `-${new Date().getTime()}`;
             
             // tunnelArguments = {

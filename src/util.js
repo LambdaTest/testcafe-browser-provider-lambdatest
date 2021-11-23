@@ -326,9 +326,9 @@ async function _parseCapabilities (id, capability) {
         try { 
             for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
         }
-        catch (err) {
+        catch (error) {
             showTrace('Error while destroying ...');
-            showTrace(err);
+            showTrace(error);
         }
         showTrace('Dispose Completed');
 

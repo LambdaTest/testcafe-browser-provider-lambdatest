@@ -322,6 +322,16 @@ async function _parseCapabilities (id, capability) {
     }
     catch (err) {
         showTrace('util._parseCapabilities error :', err);
+        //stop tunnel - 
+        try { 
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
+        }
+        catch (err) {
+            showTrace('Error while destroying ...');
+            showTrace(err);
+        }
+        showTrace('Dispose Completed');
+
         return new Error(err);
     }
 }

@@ -64,9 +64,6 @@ export default {
         
         if (capabilities instanceof Error) {
             showTrace('openBrowser error on  _parseCapabilities', capabilities);
-
-            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
-
             throw capabilities;
         }
         await this._startBrowser(id, pageUrl, capabilities);

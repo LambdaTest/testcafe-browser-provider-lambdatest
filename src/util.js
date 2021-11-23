@@ -48,7 +48,7 @@ let retryCounter = 60;
 var isTraceEnable = false;
 
 if (PROCESS_ENVIRONMENT.LT_ENABLE_TRACE)
-    isTraceEnable = false;
+    isTraceEnable = true;
 
 async function requestApi (options) {
     const response = await request(options);

@@ -254,7 +254,7 @@ async function _parseCapabilities (id, capability) {
                     const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
 
                     if (!_isRunning) {
-                        await _destroy(tunnel);
+                        // await _destroy(tunnel);
                         retryCounter = 200;
                         instanceRunning[tunnel] = false;
                         await _connect(tunnel);

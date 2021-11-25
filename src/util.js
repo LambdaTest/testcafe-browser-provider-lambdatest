@@ -162,7 +162,7 @@ async function _connect (tunnel) {
 async function _destroy (tunnel) {
     try {
         if (instances[tunnel]) {
-            const tunnelName = await instances[tunnel]?.options.tunnelName;
+            const tunnelName = await instances[tunnel].options.tunnelName;
 
             showTrace('Stopping Tunnel :', tunnelName);
 
@@ -286,7 +286,7 @@ async function _parseCapabilities (id, capability) {
             }
             var rand = getRandomInt(LT_TUNNEL_NUMBER);
 
-            capabilities[id].tunnelName = instances[rand] && instances[rand]?.options.tunnelName;
+            capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
 
             // if (rand === 0) capabilities[id].tunnelName = secondConnectorInstance && await secondConnectorInstance.getTunnelName();
             // else capabilities[id].tunnelName = connectorInstance && await connectorInstance.getTunnelName();
@@ -322,15 +322,6 @@ async function _parseCapabilities (id, capability) {
     }
     catch (err) {
         showTrace('util._parseCapabilities error :', err);
-        //stop tunnel - 
-        try { 
-            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
-        }
-        catch (error) {
-            showTrace('Error while destroying ...');
-            showTrace(error);
-        }
-        showTrace('Dispose Completed');
 
         return new Error(err);
     }

@@ -167,7 +167,7 @@ async function _destroy (tunnel) {
             showTrace('Stopping Tunnel :', tunnelName);
 
             await instances[tunnel].stop();
-            instances[tunnel] = null;
+            // instances[tunnel] = null;
         }
         // if (connectorInstance) {
         //     const tunnelName = await connectorInstance.getTunnelName();

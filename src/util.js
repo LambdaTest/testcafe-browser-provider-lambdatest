@@ -94,7 +94,8 @@ async function _getBrowserList () {
 }
 async function _connect (tunnel) {
     try {
-        if (!instances[tunnel]) {
+        if (instances[tunnel] === null) {
+            console.log('hello tunnel connected');
             instances[tunnel] = new LambdaTestTunnel();
             // connectorInstance = new LambdaTestTunnel();
             // secondConnectorInstance = new LambdaTestTunnel();
@@ -167,7 +168,7 @@ async function _destroy (tunnel) {
             showTrace('Stopping Tunnel :', tunnelName);
 
             await instances[tunnel].stop();
-            // instances[tunnel] = null;
+            instances[tunnel] = null;
         }
         // if (connectorInstance) {
         //     const tunnelName = await connectorInstance.getTunnelName();
@@ -254,7 +255,7 @@ async function _parseCapabilities (id, capability) {
                     const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
 
                     if (!_isRunning) {
-                        // await _destroy(tunnel);
+                        await _destroy(tunnel);
                         retryCounter = 200;
                         instanceRunning[tunnel] = false;
                         await _connect(tunnel);
@@ -368,7 +369,7 @@ async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults)
 async function _waitForTunnelRunning (tunnel) {
 
     while (!instanceRunning[tunnel]) {
-        await sleep(1000);
+        await sleep(3000);
         retryCounter--;
         instanceRunning[tunnel] = await instances[tunnel].isRunning();
         if (retryCounter <= 0) instanceRunning[tunnel] = true;

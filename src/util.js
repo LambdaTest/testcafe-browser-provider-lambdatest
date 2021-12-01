@@ -95,7 +95,6 @@ async function _getBrowserList () {
 async function _connect (tunnel) {
     try {
         if (instances[tunnel] === null) {
-            console.log('hello tunnel connected');
             instances[tunnel] = new LambdaTestTunnel();
             // connectorInstance = new LambdaTestTunnel();
             // secondConnectorInstance = new LambdaTestTunnel();

@@ -369,7 +369,7 @@ async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults)
 async function _waitForTunnelRunning (tunnel) {
 
     while (!instanceRunning[tunnel]) {
-        await sleep(1000);
+        await sleep(5000);
         retryCounter--;
         instanceRunning[tunnel] = await instances[tunnel].isRunning();
         if (retryCounter <= 0) instanceRunning[tunnel] = true;

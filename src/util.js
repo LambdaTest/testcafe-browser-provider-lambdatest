@@ -111,9 +111,6 @@ async function _connect (tunnel) {
                 controller: 'testcafe'
             };
 
-            if (process.env.LT_TUNNEL_NAME) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
-            else instancesArgs[tunnel].tunnelName = 'TestCafe' + tunnel + `-${new Date().getTime()}`;
-            
             // tunnelArguments = {
             //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
 
@@ -141,6 +138,10 @@ async function _connect (tunnel) {
             if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) instancesArgs[tunnel].proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
             // tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${new Date().getTime()}`;
             // tunnel2Arguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe1-${new Date().getTime()}`;
+
+            if (process.env.LT_TUNNEL_NAME) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
+            else instancesArgs[tunnel].tunnelName = 'TestCafe' + tunnel + `_${PROCESS_ENVIRONMENT.LT_USERNAME}-${new Date().getTime()}`;
+
             if (PROCESS_ENVIRONMENT.LT_DIR) instancesArgs[tunnel].dir = PROCESS_ENVIRONMENT.LT_DIR;
 
             await instances[tunnel].start(instancesArgs[tunnel]);
@@ -251,7 +252,7 @@ async function _parseCapabilities (id, capability) {
             try {
 
                 for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
-                    const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
+                    const _isRunning = await instances[tunnel].isRunning();
 
                     if (!_isRunning) {
                         await _destroy(tunnel);
@@ -368,7 +369,7 @@ async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults)
 async function _waitForTunnelRunning (tunnel) {
 
     while (!instanceRunning[tunnel]) {
-        await sleep(3000);
+        await sleep(1000);
         retryCounter--;
         instanceRunning[tunnel] = await instances[tunnel].isRunning();
         if (retryCounter <= 0) instanceRunning[tunnel] = true;

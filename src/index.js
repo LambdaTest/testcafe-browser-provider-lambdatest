@@ -32,7 +32,7 @@ export default {
             // showTrace('pingIntervalId', webDriver.pingIntervalId);
         });
         this.openedBrowsers[id] = webDriver;
-        // showTrace(capabilities);
+        showTrace(capabilities);
         try {
             await webDriver
                 .init(capabilities)

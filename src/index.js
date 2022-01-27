@@ -41,8 +41,7 @@ export default {
         }
         catch (err) {
             // for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
-            // this.dispose();
-            showTrace('Not disposing');
+            this.dispose();
 
             showTrace('Error while starting browser for ', id);
             showTrace(err);

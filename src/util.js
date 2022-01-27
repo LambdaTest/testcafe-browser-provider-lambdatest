@@ -252,50 +252,39 @@ async function _parseCapabilities (id, capability) {
         try {
             // showTrace('ConncetorInstance Data: ', secondConnectorInstance);
 
-            try {
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
+                const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
 
-                for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
-                    const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
-
-                    if (!_isRunning) {
-                        await _destroy(tunnel);
-                        retryCounter = 60;
-                        instanceRunning[tunnel] = false;
-                        await _connect(tunnel);
-                    }
+                if (!_isRunning) {
+                    await _destroy(tunnel);
+                    retryCounter = 60;
+                    instanceRunning[tunnel] = false;
+                    await _connect(tunnel);
                 }
-
-                // const _isRunning = connectorInstance && await connectorInstance.isRunning();
-                // const _secondIsRunning = secondConnectorInstance && await secondConnectorInstance.isRunning();
-
-                // console.log('_isRunning', _isRunning);
-                // console.log('connectorInstance', connectorInstance);
-
-                // if (!_isRunning) {
-                //     await _destroy();
-                //     retryCounter = 60;
-                //     isRunning = false;
-                //     await _connect();
-                // }
-                // if (!_secondIsRunning) {
-                //     await _destroy();
-                //     retryCounter = 60;
-                //     secondIsRunning = false;
-                //     await _connect();
-                // }
-                var rand = getRandomInt(LT_TUNNEL_NUMBER);
-
-                capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
             }
-            catch (err) {
-                showTrace('connectorInstance isRunning method error :', err);
-                return new Error(err);
-            }
-            // if (rand === 0) capabilities[id].tunnelName = secondConnectorInstance && await secondConnectorInstance.getTunnelName();
-            // else capabilities[id].tunnelName = connectorInstance && await connectorInstance.getTunnelName();
-            
-            // console.log('capabilities', capabilities[id]);
-        }
+
+            // const _isRunning = connectorInstance && await connectorInstance.isRunning();
+            // const _secondIsRunning = secondConnectorInstance && await secondConnectorInstance.isRunning();
+
+            // console.log('_isRunning', _isRunning);
+            // console.log('connectorInstance', connectorInstance);
+
+            // if (!_isRunning) {
+            //     await _destroy();
+            //     retryCounter = 60;
+            //     isRunning = false;
+            //     await _connect();
+            // }
+            // if (!_secondIsRunning) {
+            //     await _destroy();
+            //     retryCounter = 60;
+            //     secondIsRunning = false;
+            //     await _connect();
+            // }
+            var rand = getRandomInt(LT_TUNNEL_NUMBER);
+
+            capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
+        } 
         catch (err) {
             showTrace('_parseCapabilities Error on isRunning check error :', err);
             return new Error(err);

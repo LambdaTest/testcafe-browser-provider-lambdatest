@@ -94,69 +94,70 @@ async function _getBrowserList () {
 }
 async function _connect (tunnel) {
     try {
-        if (instances[tunnel] === null) {
-            instances[tunnel] = new LambdaTestTunnel();
-            // connectorInstance = new LambdaTestTunnel();
-            // secondConnectorInstance = new LambdaTestTunnel();
-            const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
-            const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
-
-            instancesArgs[tunnel] = {
-                user: PROCESS_ENVIRONMENT.LT_USERNAME,
-
-                key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
-
-                logFile: logFile,
-
-                controller: 'testcafe'
-            };
-
-            // tunnelArguments = {
-            //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
-
-            //     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
-
-            //     logFile: logFile,
-
-            //     controller: 'testcafe'
-            // };
-            // tunnel2Arguments = {
-            //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
-
-            //     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
-
-            //     logFile: logFile,
-
-            //     controller: 'testcafe'
-            // };
-
-            // if (v === 'true' || v === true) tunnelArguments.v = true;
-            if (v === 'true' || v === true) instancesArgs[tunnel].v = true;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) instancesArgs[tunnel].proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) instancesArgs[tunnel].proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_USER) instancesArgs[tunnel].proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-            if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) instancesArgs[tunnel].proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-            // tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${new Date().getTime()}`;
-            // tunnel2Arguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe1-${new Date().getTime()}`;
-
-            if (process.env.LT_TUNNEL_NAME) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
-            else instancesArgs[tunnel].tunnelName = 'TestCafe' + tunnel + `_${PROCESS_ENVIRONMENT.LT_USERNAME}-${new Date().getTime()}`;
-
-            if (PROCESS_ENVIRONMENT.LT_DIR) instancesArgs[tunnel].dir = PROCESS_ENVIRONMENT.LT_DIR;
-
-            if (PROCESS_ENVIRONMENT.LOAD_BALANCED_MODE) instancesArgs[tunnel].loadbalanced = true;
-
-            await instances[tunnel].start(instancesArgs[tunnel]);
-
-            // console.log(instancesArgs[tunnel]);
-            // console.log(instances[tunnel]);
-            // console.log(instanceRunning[tunnel]);
-
-            // await connectorInstance.start(tunnelArguments);
-            // await secondConnectorInstance.start(tunnel2Arguments);
+        if (!PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) {
+            if (!instances[tunnel]) {
+                instances[tunnel] = new LambdaTestTunnel();
+                // connectorInstance = new LambdaTestTunnel();
+                // secondConnectorInstance = new LambdaTestTunnel();
+                const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
+                const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
+    
+                instancesArgs[tunnel] = {
+                    user: PROCESS_ENVIRONMENT.LT_USERNAME,
+    
+                    key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+    
+                    logFile: logFile,
+    
+                    controller: 'testcafe'
+                };
+    
+                // tunnelArguments = {
+                //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
+    
+                //     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+    
+                //     logFile: logFile,
+    
+                //     controller: 'testcafe'
+                // };
+                // tunnel2Arguments = {
+                //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
+    
+                //     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+    
+                //     logFile: logFile,
+    
+                //     controller: 'testcafe'
+                // };
+    
+                // if (v === 'true' || v === true) tunnelArguments.v = true;
+                if (v === 'true' || v === true) instancesArgs[tunnel].v = true;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) instancesArgs[tunnel].proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) instancesArgs[tunnel].proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_USER) instancesArgs[tunnel].proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) instancesArgs[tunnel].proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+                // tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${new Date().getTime()}`;
+                // tunnel2Arguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe1-${new Date().getTime()}`;
+    
+                if (process.env.LT_TUNNEL_NAME) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
+                else instancesArgs[tunnel].tunnelName = 'TestCafe' + tunnel + `_${PROCESS_ENVIRONMENT.LT_USERNAME}-${new Date().getTime()}`;
+    
+                if (PROCESS_ENVIRONMENT.LT_DIR) instancesArgs[tunnel].dir = PROCESS_ENVIRONMENT.LT_DIR;
+    
+                if (PROCESS_ENVIRONMENT.LOAD_BALANCED_MODE) instancesArgs[tunnel].loadbalanced = true;
+    
+                await instances[tunnel].start(instancesArgs[tunnel]);
+    
+                // console.log(instancesArgs[tunnel]);
+                // console.log(instances[tunnel]);
+                // console.log(instanceRunning[tunnel]);
+    
+                // await connectorInstance.start(tunnelArguments);
+                // await secondConnectorInstance.start(tunnel2Arguments);
+            }
+            await _waitForTunnelRunning(tunnel);
         }
-        
-        await _waitForTunnelRunning(tunnel);
     }
     catch (err) {
         showTrace('_connect error :', err);
@@ -254,11 +255,11 @@ async function _parseCapabilities (id, capability) {
             try {
 
                 for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
-                    const _isRunning = await instances[tunnel].isRunning();
+                    const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
 
                     if (!_isRunning) {
                         await _destroy(tunnel);
-                        retryCounter = 200;
+                        retryCounter = 60;
                         instanceRunning[tunnel] = false;
                         await _connect(tunnel);
                     }
@@ -282,15 +283,14 @@ async function _parseCapabilities (id, capability) {
                 //     secondIsRunning = false;
                 //     await _connect();
                 // }
+                var rand = getRandomInt(LT_TUNNEL_NUMBER);
+
+                capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
             }
             catch (err) {
                 showTrace('connectorInstance isRunning method error :', err);
                 return new Error(err);
             }
-            var rand = getRandomInt(LT_TUNNEL_NUMBER);
-
-            capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
-
             // if (rand === 0) capabilities[id].tunnelName = secondConnectorInstance && await secondConnectorInstance.getTunnelName();
             // else capabilities[id].tunnelName = connectorInstance && await connectorInstance.getTunnelName();
             

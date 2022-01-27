@@ -144,6 +144,8 @@ async function _connect (tunnel) {
 
             if (PROCESS_ENVIRONMENT.LT_DIR) instancesArgs[tunnel].dir = PROCESS_ENVIRONMENT.LT_DIR;
 
+            instancesArgs[tunnel].loadbalanced = true;
+
             await instances[tunnel].start(instancesArgs[tunnel]);
 
             // console.log(instancesArgs[tunnel]);

@@ -32,6 +32,7 @@
     "desired-capabilities": "^0.1.0",
     "pify": "^4.0.1",
     "pinkie": "^2.0.4",
+    "portfinder": "^1.0.28",
     "request": "^2.88.0",
     "wd": "^1.11.4"
   },

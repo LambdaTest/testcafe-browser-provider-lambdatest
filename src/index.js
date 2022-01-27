@@ -21,7 +21,7 @@ export default {
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
-        const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
+        const webDriver = await wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
         const pingWebDriver = () => ping(webDriver);
         
         // showTrace('webDriver ', webDriver);

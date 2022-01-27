@@ -98,7 +98,9 @@ Use the following environment variables to set additional configuration options:
  - `LT_NETWORK` - true or false.
  - `LT_VIDEO` - true or false.
  - `LT_SCREENSHOT` - true or false.
- - `LT_TIMEZONE` - Configure tests to run on a custom time zone
+ - `LT_TIMEZONE` - Configure tests to run on a custom time zone.
+ - `LT_TUNNEL_NUMBER` - Number of tunnel to be spawned at a time.
+ - `LOAD_BALANCED_MODE` - Load balancing between multiple tunnels spawned.
 
 Example:
 

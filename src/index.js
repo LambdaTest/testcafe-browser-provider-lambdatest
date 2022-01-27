@@ -1,10 +1,9 @@
 'use strict';
 import wd from 'wd';
 
-import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
+import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace, LT_TUNNEL_NUMBER } from './util';
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
-
 
 wd.configureHttp({
     timeout: 15 * 60 * 1000,
@@ -25,11 +24,15 @@ export default {
         const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
         const pingWebDriver = () => ping(webDriver);
         
+        // showTrace('webDriver ', webDriver);
+        // showTrace('pingWebDriver', pingWebDriver);
+
         webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
+            // showTrace('pingIntervalId', webDriver.pingIntervalId);
         });
         this.openedBrowsers[id] = webDriver;
-        showTrace(capabilities);
+        // showTrace(capabilities);
         try {
             await webDriver
                 .init(capabilities)
@@ -37,7 +40,9 @@ export default {
 
         }
         catch (err) {
-            await _destroy();
+            // for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
+            this.dispose();
+
             showTrace('Error while starting browser for ', id);
             showTrace(err);
             throw err;
@@ -53,17 +58,21 @@ export default {
     async openBrowser (id, pageUrl, browserName) {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
-        await _connect();
+
+        for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _connect(tunnel);
+
         const capabilities = await _parseCapabilities(id, browserName);
         
         if (capabilities instanceof Error) {
             showTrace('openBrowser error on  _parseCapabilities', capabilities);
-            await this.dispose();
+            this.dispose();
             throw capabilities;
         }
         await this._startBrowser(id, pageUrl, capabilities);
         const sessionUrl = ` ${AUTOMATION_DASHBOARD_URL}/logs/?sessionID=${this.openedBrowsers[id].sessionID} `;
         
+        showTrace('sessionURL', sessionUrl);
+
         this.setUserAgentMetaInfo(id, sessionUrl);
     },
 
@@ -97,7 +106,8 @@ export default {
     async dispose () {
         showTrace('Dispose Initiated ...');
         try { 
-            await _destroy();
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
+
         }
         catch (err) {
             showTrace('Error while destroying ...');

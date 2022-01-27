@@ -28,7 +28,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/runtime-corejs2": "^7.6.3",
-    "@lambdatest/node-tunnel": "3.0.1",
+    "@lambdatest/node-tunnel": "3.0.2",
     "desired-capabilities": "^0.1.0",
     "pify": "^4.0.1",
     "pinkie": "^2.0.4",

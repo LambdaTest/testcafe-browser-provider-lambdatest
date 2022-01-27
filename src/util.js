@@ -289,8 +289,6 @@ async function _parseCapabilities (id, capability) {
             }
             var rand = getRandomInt(LT_TUNNEL_NUMBER);
 
-            console.log(instances[rand]);
-
             capabilities[id].tunnelName = instances[rand] && instances[rand].getTunnelName;
 
             // if (rand === 0) capabilities[id].tunnelName = secondConnectorInstance && await secondConnectorInstance.getTunnelName();

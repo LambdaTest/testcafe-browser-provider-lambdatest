@@ -24,12 +24,12 @@ export default {
         const webDriver = await wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
         const pingWebDriver = () => ping(webDriver);
         
-        // showTrace('webDriver ', webDriver);
-        // showTrace('pingWebDriver', pingWebDriver);
+        showTrace('webDriver ', webDriver);
+        showTrace('pingWebDriver', pingWebDriver);
 
         webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
-            // showTrace('pingIntervalId', webDriver.pingIntervalId);
+            showTrace('pingIntervalId', webDriver.pingIntervalId);
         });
         this.openedBrowsers[id] = webDriver;
         showTrace(capabilities);

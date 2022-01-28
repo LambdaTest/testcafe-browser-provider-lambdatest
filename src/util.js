@@ -179,31 +179,31 @@ async function _parseCapabilities (id, capability) {
         if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
         capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
 
-        // if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
-        // else {
-        try {
-            // showTrace('ConncetorInstance Data: ', secondConnectorInstance);
+        if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
+        else {
+            try {
+                // showTrace('ConncetorInstance Data: ', secondConnectorInstance);
 
-            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
-                const _isRunning = connectorInstances[tunnel].connectorInstance && await connectorInstances[tunnel].connectorInstance.isRunning();
+                for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
+                    const _isRunning = connectorInstances[tunnel].connectorInstance && await connectorInstances[tunnel].connectorInstance.isRunning();
 
-                if (!_isRunning) {
-                    await _destroy(tunnel);
-                    retryCounter = 60;
-                    connectorInstances[tunnel].isRunning = false;
-                    await _connect(tunnel);
+                    if (!_isRunning) {
+                        await _destroy(tunnel);
+                        retryCounter = 60;
+                        connectorInstances[tunnel].isRunning = false;
+                        await _connect(tunnel);
+                    }
                 }
+
+                var rand = getRandomInt(LT_TUNNEL_NUMBER);
+
+                capabilities[id].tunnelName = await connectorInstances[rand].connectorInstance.getTunnelName();
+            } 
+            catch (err) {
+                showTrace('_parseCapabilities Error on isRunning check error :', err);
+                return new Error(err);
             }
-
-            var rand = getRandomInt(LT_TUNNEL_NUMBER);
-
-            capabilities[id].tunnelName = await connectorInstances[rand].connectorInstance.getTunnelName();
-        } 
-        catch (err) {
-            showTrace('_parseCapabilities Error on isRunning check error :', err);
-            return new Error(err);
         }
-        // }
 
         if (PROCESS_ENVIRONMENT.LT_RESOLUTION) capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
         if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) capabilities[id]['selenium_version'] = PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;

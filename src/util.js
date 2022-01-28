@@ -17,33 +17,13 @@ const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER || 1;
 
-var instances = [];
+var connectorInstances = [];
 
-var instancesArgs = [];
-
-var instanceRunning = [];
-
-for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
-    instances.push(null);
-    instancesArgs.push({});
-    instanceRunning.push(false);
-}
-
-// let connectorInstance = null;
-
-// let secondConnectorInstance = null;
-
-// let tunnelArguments = { };
-
-// let tunnel2Arguments = { };
+for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) connectorInstances.push({ connectorInstance: null, tunnelArguments: {}, isRunning: false });
 
 const capabilities = { };
 
 let retryCounter = 60;
-
-// let isRunning = false;
-
-// let secondIsRunning = false;
 
 var isTraceEnable = false;
 
@@ -95,14 +75,12 @@ async function _getBrowserList () {
 async function _connect (tunnel) {
     try {
         if (!PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) {
-            if (!instances[tunnel]) {
-                instances[tunnel] = new LambdaTestTunnel();
-                // connectorInstance = new LambdaTestTunnel();
-                // secondConnectorInstance = new LambdaTestTunnel();
+            if (!connectorInstances[tunnel].connectorInstance) {
+                connectorInstances[tunnel].connectorInstance = new LambdaTestTunnel();
                 const logFile = PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
                 const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
     
-                instancesArgs[tunnel] = {
+                connectorInstances[tunnel].tunnelArguments = {
                     user: PROCESS_ENVIRONMENT.LT_USERNAME,
     
                     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
@@ -112,49 +90,20 @@ async function _connect (tunnel) {
                     controller: 'testcafe'
                 };
     
-                // tunnelArguments = {
-                //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
+                if (v === 'true' || v === true) connectorInstances[tunnel].tunnelArguments.v = true;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) connectorInstances[tunnel].tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) connectorInstances[tunnel].tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_USER) connectorInstances[tunnel].tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
+                if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) connectorInstances[tunnel].tunnelArguments.proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
+                if (process.env.LT_TUNNEL_NAME) connectorInstances[tunnel].tunnelArguments.tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
+                else connectorInstances[tunnel].tunnelArguments.tunnelName = 'TestCafe' + tunnel + `_${PROCESS_ENVIRONMENT.LT_USERNAME}-${new Date().getTime()}`;
     
-                //     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
+                if (PROCESS_ENVIRONMENT.LT_DIR) connectorInstances[tunnel].tunnelArguments.dir = PROCESS_ENVIRONMENT.LT_DIR;
     
-                //     logFile: logFile,
+                if (PROCESS_ENVIRONMENT.LOAD_BALANCED_MODE) connectorInstances[tunnel].tunnelArguments.loadbalanced = true;
     
-                //     controller: 'testcafe'
-                // };
-                // tunnel2Arguments = {
-                //     user: PROCESS_ENVIRONMENT.LT_USERNAME,
+                await connectorInstances[tunnel].connectorInstance.start(connectorInstances[tunnel].tunnelArguments);
     
-                //     key: PROCESS_ENVIRONMENT.LT_ACCESS_KEY,
-    
-                //     logFile: logFile,
-    
-                //     controller: 'testcafe'
-                // };
-    
-                // if (v === 'true' || v === true) tunnelArguments.v = true;
-                if (v === 'true' || v === true) instancesArgs[tunnel].v = true;
-                if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) instancesArgs[tunnel].proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
-                if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) instancesArgs[tunnel].proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
-                if (PROCESS_ENVIRONMENT.LT_PROXY_USER) instancesArgs[tunnel].proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;
-                if (PROCESS_ENVIRONMENT.LT_PROXY_PASS) instancesArgs[tunnel].proxyPass = PROCESS_ENVIRONMENT.LT_PROXY_PASS;
-                // tunnelArguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe-${new Date().getTime()}`;
-                // tunnel2Arguments.tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME || `TestCafe1-${new Date().getTime()}`;
-    
-                if (process.env.LT_TUNNEL_NAME) instancesArgs[tunnel].tunnelName = process.env.LT_TUNNEL_NAME + tunnel + `-${new Date().getTime()}`;   
-                else instancesArgs[tunnel].tunnelName = 'TestCafe' + tunnel + `_${PROCESS_ENVIRONMENT.LT_USERNAME}-${new Date().getTime()}`;
-    
-                if (PROCESS_ENVIRONMENT.LT_DIR) instancesArgs[tunnel].dir = PROCESS_ENVIRONMENT.LT_DIR;
-    
-                if (PROCESS_ENVIRONMENT.LOAD_BALANCED_MODE) instancesArgs[tunnel].loadbalanced = true;
-    
-                await instances[tunnel].start(instancesArgs[tunnel]);
-    
-                // console.log(instancesArgs[tunnel]);
-                // console.log(instances[tunnel]);
-                // console.log(instanceRunning[tunnel]);
-    
-                // await connectorInstance.start(tunnelArguments);
-                // await secondConnectorInstance.start(tunnel2Arguments);
             }
             await _waitForTunnelRunning(tunnel);
         }
@@ -165,31 +114,14 @@ async function _connect (tunnel) {
 }
 async function _destroy (tunnel) {
     try {
-        if (instances[tunnel]) {
-            const tunnelName = await instances[tunnel].options.tunnelName;
+        if (connectorInstances[tunnel].connectorInstance) {
+            const tunnelName = await connectorInstances[tunnel].connectorInstance.getTunnelName();
 
             showTrace('Stopping Tunnel :', tunnelName);
 
-            await instances[tunnel].stop();
-            instances[tunnel] = null;
+            await connectorInstances[tunnel].connectorInstance.stop();
+            connectorInstances[tunnel].connectorInstance = null;
         }
-        // if (connectorInstance) {
-        //     const tunnelName = await connectorInstance.getTunnelName();
-            
-        //     showTrace('Stopping Tunnel :', tunnelName);
-            
-        //     await connectorInstance.stop();
-        //     connectorInstance = null;
-        // } 
-
-        // if (secondConnectorInstance) {
-        //     const nextTunnelName = await secondConnectorInstance.getTunnelName();
-
-        //     showTrace('Stopping Second Tunnel:', nextTunnelName);
-
-        //     await secondConnectorInstance.stop();
-        //     secondConnectorInstance = null;
-        // }
     } 
     catch (err) {
         showTrace('util._destroy error :', err);
@@ -253,37 +185,19 @@ async function _parseCapabilities (id, capability) {
             // showTrace('ConncetorInstance Data: ', secondConnectorInstance);
 
             for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
-                const _isRunning = instances[tunnel] && await instances[tunnel].isRunning();
+                const _isRunning = connectorInstances[tunnel].connectorInstance && await connectorInstances[tunnel].connectorInstance.isRunning();
 
                 if (!_isRunning) {
                     await _destroy(tunnel);
                     retryCounter = 60;
-                    instanceRunning[tunnel] = false;
+                    connectorInstances[tunnel].isRunning = false;
                     await _connect(tunnel);
                 }
             }
 
-            // const _isRunning = connectorInstance && await connectorInstance.isRunning();
-            // const _secondIsRunning = secondConnectorInstance && await secondConnectorInstance.isRunning();
-
-            // console.log('_isRunning', _isRunning);
-            // console.log('connectorInstance', connectorInstance);
-
-            // if (!_isRunning) {
-            //     await _destroy();
-            //     retryCounter = 60;
-            //     isRunning = false;
-            //     await _connect();
-            // }
-            // if (!_secondIsRunning) {
-            //     await _destroy();
-            //     retryCounter = 60;
-            //     secondIsRunning = false;
-            //     await _connect();
-            // }
             var rand = getRandomInt(LT_TUNNEL_NUMBER);
 
-            capabilities[id].tunnelName = instances[rand] && instances[rand].options.tunnelName;
+            capabilities[id].tunnelName = await connectorInstances[rand].connectorInstance.getTunnelName();
         } 
         catch (err) {
             showTrace('_parseCapabilities Error on isRunning check error :', err);
@@ -359,25 +273,13 @@ async function _updateJobStatus (sessionID, jobResult, jobData, possibleResults)
 }
 async function _waitForTunnelRunning (tunnel) {
 
-    while (!instanceRunning[tunnel]) {
+    while (!connectorInstances[tunnel].isRunning) {
         await sleep(5000);
         retryCounter--;
-        instanceRunning[tunnel] = await instances[tunnel].isRunning();
-        if (retryCounter <= 0) instanceRunning[tunnel] = true;
+        connectorInstances[tunnel].isRunning = await connectorInstances[tunnel].connectorInstance.isRunning();
+        if (retryCounter <= 0) connectorInstances[tunnel].isRunning = true;
     }
-    
-    // while (!isRunning) {
-    //     await sleep(1000);
-    //     retryCounter--;
-    //     isRunning = await connectorInstance.isRunning();
-    //     if (retryCounter <= 0) isRunning = true;
-    // }
-    // while (!secondIsRunning) {
-    //     await sleep(1000);
-    //     retryCounter--;
-    //     secondIsRunning = await secondConnectorInstance.isRunning();
-    //     if (retryCounter <= 0) secondIsRunning = true;
-    // }
+
 }
 function _saveFile (screenshotPath, base64Data) {
     return new Promise((resolve, reject) => {

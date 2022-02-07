@@ -5,15 +5,18 @@ import pify from 'pify';
 import parseCapabilities from 'desired-capabilities';
 import LambdaTestTunnel from '@lambdatest/node-tunnel';
 import fs from 'fs';
+import axios from 'axios';
 
 const promisify = fn => pify(fn, Promise);
 const request   = promisify(_request, Promise);
 
 const PROCESS_ENVIRONMENT = process.env;
 const BASE_URL = 'https://api.lambdatest.com/api/v1';
+const MOBILE_BASE_URL = 'https://beta-api.lambdatest.com/api/v1';
 const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
 const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
+const MOBILE_AUTOMATION_HUB_URL = process.env.LT_MOBILE_GRID_URL || 'beta-hub.lambdatest.com';
 const LT_AUTH_ERROR = 'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
 const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER || 1;
 
@@ -53,7 +56,7 @@ function IsJsonString (str) {
 }
 
 async function _getBrowserList () {
-    const browserList = [];
+    let browserList = [];
     const osList = await requestApi(`${BASE_URL}/capability?format=array`);
 
     for (const os of osList.os) {
@@ -70,6 +73,45 @@ async function _getBrowserList () {
             for (const device of element) for (const osVersion of device.osVersion) browserList.push(`${device.deviceName}@${osVersion.version}:${key}`);
         }
     }
+
+
+    //real devices
+    await axios.get(`${MOBILE_BASE_URL}/device?sort=brand&real=true`).then((res) => {
+        const iosDevices = res.data.ios;
+
+        const androidBrands = res.data.android;
+
+        const iosDeviceList = [];
+
+        const androidDeviceList = [];
+
+        iosDevices.map((item) => {
+            const osVersion = item.osVersion;
+
+            if (item.deviceType === 'real') {
+                osVersion.map((version) => {
+                    if (version.isRealDevice === 1) iosDeviceList.push(`${item.deviceName}@${version.version}:ios:isReal`);
+                });
+            }
+        });
+
+        androidBrands.map((item) => {
+            const androidDevices = item.devices;
+
+            androidDevices.map((device) => {
+                if (device.deviceType === 'real') {
+                    const osVersion = device.osVersion;
+
+                    osVersion.map((version) => {
+                        if (version.isRealDevice === 1) androidDeviceList.push(`${device.deviceName}@${version.version}:android:isReal`);
+                    });
+                }
+            });
+        });
+
+        browserList = [...browserList, ...iosDeviceList, ...androidDeviceList];
+    });
+
     return browserList;
 }
 async function _connect (tunnel) {
@@ -139,16 +181,29 @@ async function _parseCapabilities (id, capability) {
 
         // showTrace('capability', capability);
         const parseCapabilitiesData = parseCapabilities(capability)[0];
-        const browserName = parseCapabilitiesData.browserName;
+
+        let browserName = parseCapabilitiesData.browserName;
+
         const browserVersion = parseCapabilitiesData.browserVersion;
         const platform = parseCapabilitiesData.platform;
-        const lPlatform = platform.toLowerCase();
+
+        let lPlatform = platform.toLowerCase();
         
         capabilities[id] = {
             tunnel: true,
 
             plugin: `${testcafeDetail.name}:${testcafeDetail.version}`
         };
+
+        if (capability.indexOf('isReal') > 0) {
+            browserName = capability.split('@')[0];
+            lPlatform = platform.split(':')[0];
+            capabilities[id].isRealMobile = true;
+        }
+
+        if (lPlatform === 'android') capabilities[id].browserName = 'chrome';
+        else if (lPlatform === 'ios') capabilities[id].browserName = 'safari';
+
         if (['ios', 'android'].includes(lPlatform)) {
             capabilities[id].platformName = lPlatform;
             capabilities[id].deviceName = browserName;
@@ -316,6 +371,7 @@ export default {
     AUTOMATION_DASHBOARD_URL,
     AUTOMATION_HUB_URL,
     LT_TUNNEL_NUMBER,
+    MOBILE_AUTOMATION_HUB_URL,
     _connect,
     _destroy,
     _getBrowserList,

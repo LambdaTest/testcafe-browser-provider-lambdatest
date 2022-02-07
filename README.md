@@ -32,6 +32,16 @@ For Parallel/Multiple Configuration
 $ testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "path/to/test/file.js"
 ```
 
+For Real Devices
+```sh
+$ testcafe "lambdatest:Galaxy S8@9:android:isReal" "path/to/test/file.js"
+```
+
+
+```
+Not valid for real Devices: ---
+                              v
+```
 When you use API, pass the alias to the `browsers()` method:
 
 ```js
@@ -93,12 +103,12 @@ Use the following environment variables to set additional configuration options:
  - `LT_PROXY_PASS` - Password for the USERNAME option.
  - `LT_TUNNEL_NAME` - Human readable tunnel identifier (Name of the tunnel).
  - `LT_DIR` - Path of the local folder you want to test.
- - `LT_SELENIUM_VERSION` - Browser specific capability
+ - `LT_SELENIUM_VERSION` - Browser specific capability (Not for Real Devices)
  - `LT_CONSOLE` - true or false.
  - `LT_NETWORK` - true or false.
  - `LT_VIDEO` - true or false.
  - `LT_SCREENSHOT` - true or false.
- - `LT_TIMEZONE` - Configure tests to run on a custom time zone.
+ - `LT_TIMEZONE` - Configure tests to run on a custom time zone. (Not for Real Devices)
  - `LT_TUNNEL_NUMBER` - Number of tunnel to be spawned at a time.
  - `LOAD_BALANCED_MODE` - Load balancing between multiple tunnels spawned.
 
@@ -109,6 +119,14 @@ export LT_RESOLUTION="1920x1080"
 export LT_TEST_NAME="Test TestCafe"
 export LT_BUILD="Build x"
 testcafe "lambdatest:Chrome","lambdatest:Chrome@74.0:Windows 8" tests/
+```
+
+```
+LT_TIMEZONE
+LT_SELENIUM_VERSION
+LT_RESOLUTION
+
+Above are not valid for real devices
 ```
 
 ## About LambdaTest

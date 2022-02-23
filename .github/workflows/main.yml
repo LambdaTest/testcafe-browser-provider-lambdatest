@@ -1,9 +1,9 @@
 name: Test-cafe Health check
 on:
- push: [master]
-  #schedule:
-   #- cron: "0 22 * * *"   
- jobs:
+ push:  
+   branches: [master]
+ 
+jobs:
   build:
    runs-on: ubuntu-latest
        
@@ -30,7 +30,7 @@ on:
         run: npm link
         
       - name: Run single test
-        name: testcafe "lambdatest:Chrome@74.0:Windows 8" "test/test.js"  
+        run: testcafe "lambdatest:Chrome@74.0:Windows 8" "test/test.js"  
         
     
         

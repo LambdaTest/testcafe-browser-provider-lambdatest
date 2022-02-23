@@ -1,6 +1,6 @@
-LT_TUNNEL_NAME# testcafe-browser-provider-lambdatest
+# npm Plugin For TestCafe Integration With LambdaTest
 
-[![Build Status](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest.svg)](https://travis-ci.org/LambdaTest/testcafe-browser-provider-lambdatest)
+[![Testcafe Health Check](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/actions/workflows/main.yml/badge.svg)](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/actions/workflows/main.yml)
 
 This plugin integrates [TestCafe](http://devexpress.github.io/testcafe) with the [LambdaTest Testing Cloud](https://www.lambdatest.com/).
 
@@ -32,6 +32,16 @@ For Parallel/Multiple Configuration
 $ testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "path/to/test/file.js"
 ```
 
+For Real Devices
+```sh
+$ testcafe "lambdatest:Galaxy S8@9:android:isReal" "path/to/test/file.js"
+```
+
+
+```
+Not valid for real Devices: ---
+                              v
+```
 When you use API, pass the alias to the `browsers()` method:
 
 ```js
@@ -70,19 +80,22 @@ Use the following environment variables to set additional configuration options:
 
  - `LT_TEST_NAME` - Test name on LambdaTest.
  - `LT_BUILD` - Build name on LambdaTest.
- - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON.
+ - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON file (eg. config.json)
 
     ```js
-        "Chrome@63.0:Windows 8.1" : {
-            "network" : true,
-            "visual" : true,
-            "timezone" : "UTC+11:00"
+    {
+        "Chrome@63.0:Windows 8.1": {
+            "network": true,
+            "visual": true,
+            "timezone": "UTC+11:00"
         }
+    }
     ```
     - `Chrome@63.0:Windows 8.1` is browser alias.
  - `LT_RESOLUTION` - allows setting the screen resolution for desktop browsers in the `${width}x${height}` format.
  - `LT_LOGFILE` - Logfile You can provide a specific path to this file. If you won't provide a path then the logs would be saved in your present working directory by the filename: tunnel.log.
  - `LT_VERBOSE` - true or false.
+ - `LT_W3C` - true or false.
  - `LT_ENABLE_TRACE` - true or false.
  - `LT_PROXY_HOST` - Hostname/IP of proxy, this is a mandatory value.
  - `LT_PROXY_PORT` - Port for the proxy, by default it would consider 3128 if proxyhost is used For Basic Authentication, we use the below proxy options.
@@ -90,12 +103,14 @@ Use the following environment variables to set additional configuration options:
  - `LT_PROXY_PASS` - Password for the USERNAME option.
  - `LT_TUNNEL_NAME` - Human readable tunnel identifier (Name of the tunnel).
  - `LT_DIR` - Path of the local folder you want to test.
- - `LT_SELENIUM_VERSION` - Browser specific capability
+ - `LT_SELENIUM_VERSION` - Browser specific capability (Not for Real Devices)
  - `LT_CONSOLE` - true or false.
  - `LT_NETWORK` - true or false.
  - `LT_VIDEO` - true or false.
  - `LT_SCREENSHOT` - true or false.
- - `LT_TIMEZONE` - Configure tests to run on a custom time zone
+ - `LT_TIMEZONE` - Configure tests to run on a custom time zone. (Not for Real Devices)
+ - `LT_TUNNEL_NUMBER` - Number of tunnel to be spawned at a time.
+ - `LOAD_BALANCED_MODE` - Load balancing between multiple tunnels spawned.
 
 Example:
 
@@ -106,9 +121,17 @@ export LT_BUILD="Build x"
 testcafe "lambdatest:Chrome","lambdatest:Chrome@74.0:Windows 8" tests/
 ```
 
+```
+LT_TIMEZONE
+LT_SELENIUM_VERSION
+LT_RESOLUTION
+
+Above are not valid for real devices
+```
+
 ## About LambdaTest
 
-[LambdaTest](https://www.lambdatest.com/) is a cloud based selenium grid infrastructure that can help you run automated cross browser compatibility tests on 2000+ different browser and operating system environments. All test data generated during testing including Selenium command logs, screenshots generated in testing, video logs, selenium logs, network logs, console logs, and metadata logs can be extracted using [LambdaTest automation APIs](https://www.lambdatest.com/support/docs/api-doc/). This data can then be used for creating custom reports.
+[LambdaTest](https://www.lambdatest.com/) is a cloud based selenium grid infrastructure that can help you run automated cross browser compatibility tests on 2000+ different browser and operating system environments. LambdaTest supports all programming languages and frameworks that are supported with Selenium, and have easy integrations with all popular CI/CD platforms. It's a perfect solution to bring your [selenium automation testing](https://www.lambdatest.com/selenium-automation) to cloud based infrastructure that not only helps you increase your test coverage over multiple desktop and mobile browsers, but also allows you to cut down your test execution time by running tests on parallel.
 
 ## License
 

@@ -1,17 +1,14 @@
 'use strict';
 import wd from 'wd';
 
-import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
+import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, MOBILE_AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace, LT_TUNNEL_NUMBER } from './util';
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
-
 wd.configureHttp({
-    timeout: 9 * 60 * 1000,
+    timeout: 15 * 60 * 1000,
     
-    retries: 3,
-    
-    retryDelay: 30 * 1000
+    retries: -1,
 });
 
 export default {
@@ -24,11 +21,19 @@ export default {
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
-        const webDriver = wd.promiseChainRemote(AUTOMATION_HUB_URL, 80, PROCESS_ENVIRONMENT.LT_USERNAME, PROCESS_ENVIRONMENT.LT_ACCESS_KEY);
-        const pingWebDriver = () => webDriver.eval('');
+        console.log('capaibilites', capabilities);
+        let webDriver = await wd.promiseChainRemote(`https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${AUTOMATION_HUB_URL}:443/wd/hub`, 443);
+
+        if (capabilities.isRealMobile) webDriver = await wd.promiseChainRemote(`https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${MOBILE_AUTOMATION_HUB_URL}:443/wd/hub`, 443);
+
+        const pingWebDriver = () => ping(webDriver);
+        
+        showTrace('webDriver ', webDriver);
+        showTrace('pingWebDriver', pingWebDriver);
 
         webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(pingWebDriver, WEB_DRIVER_PING_INTERVAL);
+            showTrace('pingIntervalId', webDriver.pingIntervalId);
         });
         this.openedBrowsers[id] = webDriver;
         showTrace(capabilities);
@@ -39,7 +44,9 @@ export default {
 
         }
         catch (err) {
-            await _destroy();
+            // for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
+            this.dispose();
+
             showTrace('Error while starting browser for ', id);
             showTrace(err);
             throw err;
@@ -55,19 +62,42 @@ export default {
     async openBrowser (id, pageUrl, browserName) {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
-        await _connect();
-        const capabilities = await _parseCapabilities(id, browserName);
 
+        for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _connect(tunnel);
+
+        const capabilities = await _parseCapabilities(id, browserName);
+        
+        if (capabilities instanceof Error) {
+            showTrace('openBrowser error on  _parseCapabilities', capabilities);
+            this.dispose();
+            throw capabilities;
+        }
         await this._startBrowser(id, pageUrl, capabilities);
         const sessionUrl = ` ${AUTOMATION_DASHBOARD_URL}/logs/?sessionID=${this.openedBrowsers[id].sessionID} `;
         
+        showTrace('sessionURL', sessionUrl);
+
         this.setUserAgentMetaInfo(id, sessionUrl);
     },
 
     async closeBrowser (id) {
         showTrace('closeBrowser Initiated for ', id);
-        if (this.openedBrowsers[id] && this.openedBrowsers[id].sessionID)
+        if (this.openedBrowsers[id]) {
             showTrace(this.openedBrowsers[id].sessionID);
+            clearInterval(this.openedBrowsers[id].pingIntervalId);
+            if (this.openedBrowsers[id].sessionID) {
+                try {
+                    await this.openedBrowsers[id].quit();
+                }
+                catch (err) {
+                    showTrace(err);
+                }
+            }
+            else {
+                showTrace('SessionID not found for ', id);
+                showTrace(this.openedBrowsers[id]);
+            }
+        } 
         else 
             showTrace('Browser not found in OPEN STATE for ', id);
     },
@@ -80,28 +110,8 @@ export default {
     async dispose () {
         showTrace('Dispose Initiated ...');
         try { 
-            for (const key in this.openedBrowsers) {
-                clearInterval(this.openedBrowsers[key].pingIntervalId);
-                if (this.openedBrowsers[key].sessionID) {
-                    try {
-                        await this.openedBrowsers[key].quit();
-                    }
-                    catch (err) {
-                        showTrace(err);
-                    }
-                }
-                else {
-                    showTrace('SessionID not found for ', key);
-                    showTrace(this.openedBrowsers[key]);
-                }
-            }
-        }
-        catch (err) {
-            showTrace('Error while disposing ...');
-            showTrace(err);
-        }
-        try { 
-            await _destroy();
+            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
+
         }
         catch (err) {
             showTrace('Error while destroying ...');
@@ -145,3 +155,18 @@ export default {
         return null;
     }
 };
+
+function handlePingError (err, res) {
+    if (err) {
+        showTrace('ping error :');
+        showTrace(err);
+    } 
+    else {
+        showTrace('ignore ping response :');
+        showTrace(res);
+    }
+}
+
+function ping (webDriver) {
+    webDriver.safeExecute(1, handlePingError);
+}

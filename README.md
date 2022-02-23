@@ -1,6 +1,6 @@
 # npm Plugin For TestCafe Integration With LambdaTest
 
-[![Test-cafe Health Check](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/actions/workflows/main.yml/badge.svg)](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/actions/workflows/main.yml)
+[![Testcafe Health Check](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/actions/workflows/main.yml/badge.svg)](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/actions/workflows/main.yml)
 
 This plugin integrates [TestCafe](http://devexpress.github.io/testcafe) with the [LambdaTest Testing Cloud](https://www.lambdatest.com/).
 

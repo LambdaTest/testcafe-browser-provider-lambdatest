@@ -1,10 +1,8 @@
 name: Test-cafe Health check
 on:
-  push: [master]
+ push: [master]
   #schedule:
-   #- cron: "0 22 * * *"
-
-    
+   #- cron: "0 22 * * *"   
  jobs:
   build:
    runs-on: ubuntu-latest

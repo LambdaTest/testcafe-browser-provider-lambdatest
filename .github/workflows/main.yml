@@ -1,7 +1,7 @@
 name: Test-cafe Health Check
 on:
   schedule:
-  - cron: "*/5 * * * *" 
+   - cron: "*/5 * * * *" 
    
 jobs:
   build:

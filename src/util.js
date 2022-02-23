@@ -199,6 +199,7 @@ async function _parseCapabilities (id, capability) {
             browserName = capability.split('@')[0];
             lPlatform = platform.split(':')[0];
             capabilities[id].isRealMobile = true;
+            if (process.env.LT_VISUAL) capabilities[id].visual = true;
         }
 
         if (lPlatform === 'android') capabilities[id].browserName = 'chrome';

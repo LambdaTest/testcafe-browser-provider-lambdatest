@@ -8,7 +8,9 @@ on:
 jobs:
   build:
    runs-on: ubuntu-latest
-   
+   env:
+       LT_USERNAME: ${{ secrets.LT_USERNAME }} 
+       LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
    steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 14.x
@@ -31,23 +33,15 @@ jobs:
         
       - name: Run single test
         run: testcafe "lambdatest:Chrome@74.0:Windows 8" "test/test.js"  
-        env: 
-         LT_USERNAME: ${{ secrets.LT_USERNAME }} 
-         LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
-         
-         
+        
+                
       - name: Run Parallel test
         run: testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "test/test.js" 
-        env: 
-         LT_USERNAME: ${{ secrets.LT_USERNAME }} 
-         LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}  
-         
+ 
          
       - name: Run Mobile test
         run: testcafe "lambdatest:Galaxy S8@9:android:isReal" "test/test.js"
-        env: 
-         LT_USERNAME: ${{ secrets.LT_USERNAME }} 
-         LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}     
+      
     
         
       

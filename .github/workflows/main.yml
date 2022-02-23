@@ -6,7 +6,7 @@ on:
 jobs:
   build:
    runs-on: ubuntu-latest
-       
+   
    steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 14.x
@@ -29,7 +29,9 @@ jobs:
         
       - name: Run single test
         run: testcafe "lambdatest:Chrome@74.0:Windows 8" "test/test.js"  
-        
+        env: 
+         LT_USERNAME: ${{ secrets.LT_USERNAME }} 
+         LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
     
         
       

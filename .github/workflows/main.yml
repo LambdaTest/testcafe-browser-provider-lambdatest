@@ -33,7 +33,9 @@ jobs:
         
       - name: Run single test
         run: testcafe "lambdatest:Chrome@74.0:Windows 8" "test/test.js"  
-        
-                
+              
       - name: Run Parallel test
         run: testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "test/test.js"
+        
+      - name: Run Mobile test
+        run: testcafe "lambdatest:Galaxy S8@9:android:isReal" "test/mobile.js"

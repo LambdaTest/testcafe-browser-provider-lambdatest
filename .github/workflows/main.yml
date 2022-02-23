@@ -1,9 +1,7 @@
 name: Test-cafe Health Check
 on:
   schedule:
-  - cron: "0 22 * * *" 
-  
-  workflow_dispatch:
+  - cron: "*/5 * * * *" 
    
 jobs:
   build:

@@ -2,7 +2,7 @@ name: Test-cafe Health Check
 on:
  push:  
    branches: [master]
- 
+   
 jobs:
   build:
    runs-on: ubuntu-latest
@@ -32,6 +32,20 @@ jobs:
         env: 
          LT_USERNAME: ${{ secrets.LT_USERNAME }} 
          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+         
+         
+      - name: Run Parallel test
+        run: testcafe "lambdatest:Chrome@74.0:Windows 8","lambdatest:Chrome@75.0:Windows 10" "test/test.js" 
+        env: 
+         LT_USERNAME: ${{ secrets.LT_USERNAME }} 
+         LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}  
+         
+         
+      - name: Run Mobile test
+        run: testcafe "lambdatest:Galaxy S8@9:android:isReal" "test/test.js"
+        env: 
+         LT_USERNAME: ${{ secrets.LT_USERNAME }} 
+         LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}     
     
         
       

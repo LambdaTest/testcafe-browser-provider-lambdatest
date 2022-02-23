@@ -1,4 +1,4 @@
-name: Test-cafe Health check
+name: Test-cafe Health Check
 on:
  push:  
    branches: [master]

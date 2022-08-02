@@ -187,6 +187,9 @@ async function _parseCapabilities (id, capability) {
         const browserVersion = parseCapabilitiesData.browserVersion;
         const platform = parseCapabilitiesData.platform;
 
+        if (parseCapabilitiesData.name) capabilities[id].name = parseCapabilitiesData.name;
+        
+
         let lPlatform = platform.toLowerCase();
         
         capabilities[id] = {
@@ -233,7 +236,7 @@ async function _parseCapabilities (id, capability) {
         }
 
         if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
-        capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || `TestCafe test run ${id}`;
+        capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || capabilities[id].name || `TestCafe test run ${id}`;
 
         if (PROCESS_ENVIRONMENT.LT_TUNNEL_NAME) capabilities[id].tunnelName = PROCESS_ENVIRONMENT.LT_TUNNEL_NAME;
         else {

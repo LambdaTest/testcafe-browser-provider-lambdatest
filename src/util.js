@@ -185,10 +185,7 @@ async function _parseCapabilities (id, capability) {
         let browserName = parseCapabilitiesData.browserName;
 
         const browserVersion = parseCapabilitiesData.browserVersion;
-        const platform = parseCapabilitiesData.platform;
-
-        if (parseCapabilitiesData.name) capabilities[id].name = parseCapabilitiesData.name;
-        
+        const platform = parseCapabilitiesData.platform;        
 
         let lPlatform = platform.toLowerCase();
         

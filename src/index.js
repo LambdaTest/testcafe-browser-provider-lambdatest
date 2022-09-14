@@ -1,7 +1,7 @@
 'use strict';
 import wd from 'wd';
 
-import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, MOBILE_AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace, LT_TUNNEL_NUMBER } from './util';
+import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, MOBILE_AUTOMATION_HUB_URL, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace } from './util';
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
@@ -21,7 +21,7 @@ export default {
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
-        console.log('capaibilites', capabilities);
+        console.log('capabilites', capabilities);
         let webDriver = await wd.promiseChainRemote(`https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${AUTOMATION_HUB_URL}:443/wd/hub`, 443);
 
         if (capabilities.isRealMobile) webDriver = await wd.promiseChainRemote(`https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${MOBILE_AUTOMATION_HUB_URL}:443/wd/hub`, 443);
@@ -44,7 +44,6 @@ export default {
 
         }
         catch (err) {
-            // for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
             this.dispose();
 
             showTrace('Error while starting browser for ', id);
@@ -62,8 +61,6 @@ export default {
     async openBrowser (id, pageUrl, browserName) {
         if (!PROCESS_ENVIRONMENT.LT_USERNAME || !PROCESS_ENVIRONMENT.LT_ACCESS_KEY)
             throw new Error(LT_AUTH_ERROR);
-
-        for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _connect(tunnel);
 
         const capabilities = await _parseCapabilities(id, browserName);
         
@@ -106,18 +103,6 @@ export default {
     // Initialization
     async init () {
         this.browserNames = await _getBrowserList();
-    },
-    async dispose () {
-        showTrace('Dispose Initiated ...');
-        try { 
-            for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
-
-        }
-        catch (err) {
-            showTrace('Error while destroying ...');
-            showTrace(err);
-        }
-        showTrace('Dispose Completed');
     },
     // Browser names handling
     async getBrowserList () {

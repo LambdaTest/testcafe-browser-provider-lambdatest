@@ -30,8 +30,11 @@ gulp.task('build', gulp.series('clean', 'lint', function () {
 }));
 
 gulp.task('test', gulp.series('build', function () {
+    var args = require('yargs').argv;
+    var source = args.file ? args.file : 'test/**.js';
+    
     return gulp
-        .src('test/**.js')
+        .src(source)
         .pipe(mocha({
             ui:       'bdd',
             reporter: 'spec',

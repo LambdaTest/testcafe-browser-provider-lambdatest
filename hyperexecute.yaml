@@ -1,0 +1,21 @@
+version: 0.1
+globalTimeout: 90
+testSuiteTimeout: 90
+testSuiteStep: 90
+runson: win
+autosplit: true
+concurrency: 1
+pre:
+  - npm --version
+  - npm install
+  - npm install -g testcafe
+  - npm run build
+  - npm link
+cacheKey: '{{ checksum "package-lock.json" }}'
+cacheDirectories:
+  - node_modules
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: echo test/test.js
+testRunnerCommand: testcafe "lambdatest:Chrome@103.0:Windows 10" "$test"

@@ -279,6 +279,8 @@ async function _parseCapabilities (id, capability) {
         if (browserName && browserName.toLowerCase() === 'firefox' && browserVersion && browserVersion.split('.')[0] > 47 && !('enableCustomTranslation' in capabilities[id]))
             capabilities[id].enableCustomTranslation = true;
 
+        if (browserName && browserName.toLowerCase() === 'safari' && browserVersion && browserVersion.split('.')[0] > 11 && !('enableCustomTranslation' in capabilities[id]))
+            capabilities[id].enableCustomTranslation = true;
         // showTrace('Parsed Capabilities ', capabilities[id]);
 
         return capabilities[id];

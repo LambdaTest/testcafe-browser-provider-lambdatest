@@ -133,6 +133,7 @@ async function _connect (tunnel) {
                 };
     
                 if (v === 'true' || v === true) connectorInstances[tunnel].tunnelArguments.v = true;
+                if (PROCESS_ENVIRONMENT.LT_MITM) connectorInstances[tunnel].tunnelArguments.mitm = PROCESS_ENVIRONMENT.LT_MITM;
                 if (PROCESS_ENVIRONMENT.LT_PROXY_HOST) connectorInstances[tunnel].tunnelArguments.proxyHost = PROCESS_ENVIRONMENT.LT_PROXY_HOST;
                 if (PROCESS_ENVIRONMENT.LT_PROXY_PORT) connectorInstances[tunnel].tunnelArguments.proxyPort = PROCESS_ENVIRONMENT.LT_PROXY_PORT;
                 if (PROCESS_ENVIRONMENT.LT_PROXY_USER) connectorInstances[tunnel].tunnelArguments.proxyUser = PROCESS_ENVIRONMENT.LT_PROXY_USER;

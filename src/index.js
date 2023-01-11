@@ -5,7 +5,6 @@ import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATIO
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
-
 wd.configureHttp({
     timeout: 15 * 60 * 1000,
     
@@ -132,15 +131,13 @@ export default {
 
     // Extra methods
     async resizeWindow (id, width, height) {
-
-
-        const _windowHandle = await this.openedBrowsers[id].windowHandles();
+        const _windowHandle = await this.openedBrowsers[id].windowHandle();
         
         await this.openedBrowsers[id].windowSize(_windowHandle, width, height);
     },
 
     async maximizeWindow (id) {
-        const _windowHandle = await this.openedBrowsers[id].windowHandles();
+        const _windowHandle = await this.openedBrowsers[id].windowHandle();
         
         await this.openedBrowsers[id].maximize(_windowHandle);
     },

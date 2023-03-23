@@ -276,10 +276,6 @@ async function _parseCapabilities (id, capability) {
         if (PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === true || PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === 'true') capabilities[id]['safari.cookies'] = true;
         if (PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === true || PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === 'true') capabilities[id]['safari.popups'] = true;
         
-        if (!browserName || browserName === 'any'){
-            const browserKey = Object.keys(additionalCapabilities)[0];
-            browserName = browserKey;
-        }
         if (!browserVersion || browserVersion === 'any'){
             const browserVersionKey = additionalCapabilities[capability]['browserVersion'];
             browserVersion = browserVersionKey;

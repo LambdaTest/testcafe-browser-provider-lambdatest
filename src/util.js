@@ -292,7 +292,6 @@ async function _parseCapabilities (id, capability) {
             
 
         }
-   
         // showTrace('Parsed Capabilities ', capabilities[id]);
 
         return capabilities[id];

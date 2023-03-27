@@ -216,8 +216,10 @@ async function _parseCapabilities (id, capability) {
             capabilities[id].version = browserVersion.toLowerCase();
             capabilities[id].platform = lPlatform;
         }
+        let additionalCapabilities = { };
+
         if (PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH) {
-            let additionalCapabilities = { };
+            
 
             try {
                 additionalCapabilities = await _getAdditionalCapabilities(PROCESS_ENVIRONMENT.LT_CAPABILITY_PATH);
@@ -276,16 +278,20 @@ async function _parseCapabilities (id, capability) {
         if (PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === true || PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === 'true') capabilities[id]['safari.cookies'] = true;
         if (PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === true || PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === 'true') capabilities[id]['safari.popups'] = true;
         
-        if (!browserVersion || browserVersion === 'any'){
-            const browserVersionKey = additionalCapabilities[capability]['browserVersion'];
-            browserVersion = browserVersionKey;
-        }
-   
-        if (browserName && browserName.trim().toLowerCase() === 'firefox' && browserVersion && browserVersion.split('.')[0] > 47 && !('enableCustomTranslation' in capabilities[id]))
-            capabilities[id].enableCustomTranslation = true;
+        if (browserName && browserName.trim().toLowerCase() === 'firefox' && browserVersion && browserVersion.split('.')[0] > 47 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
 
-        if (browserName && browserName.trim().toLowerCase() === 'safari' && browserVersion && browserVersion.split('.')[0] > 11 && !('enableCustomTranslation' in capabilities[id]))
-            capabilities[id].enableCustomTranslation = true;
+        if (browserName && browserName.trim().toLowerCase() === 'safari' && browserVersion && browserVersion.split('.')[0] > 11 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
+
+        if (!browserVersion || browserVersion === 'any') {
+
+            const browserVersionKey = additionalCapabilities[capability]['browserVersion'];
+
+            if (browserName && browserName.trim().toLowerCase() === 'firefox' && browserVersionKey && browserVersionKey.split('.')[0] > 47 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
+
+            if (browserName && browserName.trim().toLowerCase() === 'safari' && browserVersionKey && browserVersionKey.split('.')[0] > 11 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
+            
+
+        }
         // showTrace('Parsed Capabilities ', capabilities[id]);
 
         return capabilities[id];

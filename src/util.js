@@ -282,12 +282,9 @@ async function _parseCapabilities (id, capability) {
 
         if (browserName && browserName.trim().toLowerCase() === 'safari' && browserVersion && browserVersion.split('.')[0] > 11 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
 
-        if (!browserVersion || browserVersion === 'any') {
-
+        if (!browserVersion || browserVersion === 'any' && additionalCapabilities[capability] !== undefined) {
             const browserVersionKey = additionalCapabilities[capability]['browserVersion'];
-
             if (browserName && browserName.trim().toLowerCase() === 'firefox' && browserVersionKey && browserVersionKey.split('.')[0] > 47 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
-
             if (browserName && browserName.trim().toLowerCase() === 'safari' && browserVersionKey && browserVersionKey.split('.')[0] > 11 && !('enableCustomTranslation' in capabilities[id])) capabilities[id].enableCustomTranslation = true;
             
 

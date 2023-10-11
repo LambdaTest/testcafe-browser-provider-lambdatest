@@ -22,7 +22,7 @@ export default {
     openedBrowsers: { },
     async _startBrowser (id, url, capabilities) {
         showTrace('StartBrowser Initiated for ', id);
-        console.log('capaibilites', capabilities);
+        console.log('capabilities', capabilities);
         let webDriver = await wd.promiseChainRemote(`https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${AUTOMATION_HUB_URL}:443/wd/hub`, 443);
 
         if (capabilities.isRealMobile) webDriver = await wd.promiseChainRemote(`https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${MOBILE_AUTOMATION_HUB_URL}:443/wd/hub`, 443);

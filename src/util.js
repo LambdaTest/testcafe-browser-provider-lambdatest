@@ -12,7 +12,7 @@ const request   = promisify(_request, Promise);
 
 const PROCESS_ENVIRONMENT = process.env;
 const BASE_URL = 'https://api.lambdatest.com/api/v1';
-const MOBILE_BASE_URL = 'https://beta-api.lambdatest.com/api/v1';
+const MOBILE_BASE_URL = 'https://mobile-api.lambdatest.com/mobile-automation/api/v1';
 const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
 const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
 const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
@@ -76,23 +76,25 @@ async function _getBrowserList () {
 
 
     //real devices
-    await axios.get(`${MOBILE_BASE_URL}/device?sort=brand&real=true`).then((res) => {
-        const iosDevices = res.data.ios;
+    await axios.get(`${MOBILE_BASE_URL}/real/list`).then((res) => {
 
-        const androidBrands = res.data.android;
+        var iosBrands = res.data.ios;
+        var androidBrands = res.data.android;
+        var iosDeviceList = [];
+        var androidDeviceList = [];
+            
+        iosBrands.map((brand) => {
+            const iosDevices = brand.devices;
 
-        const iosDeviceList = [];
+            iosDevices.map((device) => {
+                if (device.deviceType === 'real') {
+                    const osVersion = device.osVersion;
 
-        const androidDeviceList = [];
-
-        iosDevices.map((item) => {
-            const osVersion = item.osVersion;
-
-            if (item.deviceType === 'real') {
-                osVersion.map((version) => {
-                    if (version.isRealDevice === 1) iosDeviceList.push(`${item.deviceName}@${version.version}:ios:isReal`);
-                });
-            }
+                    osVersion.map((version) => {
+                        if (device.isRealDevice === 1) iosDeviceList.push(`${device.deviceName}@${version.version}:ios:isReal`);
+                    });
+                }
+            });
         });
 
         androidBrands.map((item) => {
@@ -103,7 +105,7 @@ async function _getBrowserList () {
                     const osVersion = device.osVersion;
 
                     osVersion.map((version) => {
-                        if (version.isRealDevice === 1) androidDeviceList.push(`${device.deviceName}@${version.version}:android:isReal`);
+                        if (device.isRealDevice === 1) androidDeviceList.push(`${device.deviceName}@${version.version}:android:isReal`);
                     });
                 }
             });

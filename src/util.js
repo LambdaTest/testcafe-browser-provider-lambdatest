@@ -78,34 +78,34 @@ async function _getBrowserList () {
     //real devices
     await axios.get(`${MOBILE_BASE_URL}/real/list`).then((res) => {
 
-        var iosBrands = res.data.ios;
-        var androidBrands = res.data.android;
+        var iosBrands = res?.data?.ios;
+        var androidBrands = res?.data?.android;
         var iosDeviceList = [];
         var androidDeviceList = [];
             
         iosBrands.map((brand) => {
-            const iosDevices = brand.devices;
+            const iosDevices = brand?.devices;
 
             iosDevices.map((device) => {
-                if (device.deviceType === 'real') {
-                    const osVersion = device.osVersion;
+                if (device?.deviceType === 'real') {
+                    const osVersion = device?.osVersion;
 
                     osVersion.map((version) => {
-                        if (device.isRealDevice === 1) iosDeviceList.push(`${device.deviceName}@${version.version}:ios:isReal`);
+                        if (device?.isRealDevice === 1) iosDeviceList.push(`${device?.deviceName}@${version?.version}:ios:isReal`);
                     });
                 }
             });
         });
 
         androidBrands.map((item) => {
-            const androidDevices = item.devices;
+            const androidDevices = item?.devices;
 
             androidDevices.map((device) => {
-                if (device.deviceType === 'real') {
-                    const osVersion = device.osVersion;
+                if (device?.deviceType === 'real') {
+                    const osVersion = device?.osVersion;
 
                     osVersion.map((version) => {
-                        if (device.isRealDevice === 1) androidDeviceList.push(`${device.deviceName}@${version.version}:android:isReal`);
+                        if (device?.isRealDevice === 1) androidDeviceList.push(`${device?.deviceName}@${version?.version}:android:isReal`);
                     });
                 }
             });

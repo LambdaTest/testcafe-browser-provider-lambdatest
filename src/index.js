@@ -1,5 +1,6 @@
 'use strict';
 import wd from 'wd';
+import fs from 'fs/promises';
 
 import { LT_AUTH_ERROR, PROCESS_ENVIRONMENT, AUTOMATION_DASHBOARD_URL, AUTOMATION_HUB_URL, MOBILE_AUTOMATION_HUB_URL, _connect, _destroy, _getBrowserList, _parseCapabilities, _saveFile, _updateJobStatus, showTrace, LT_TUNNEL_NUMBER } from './util';
 
@@ -75,6 +76,12 @@ export default {
         }
         await this._startBrowser(id, pageUrl, capabilities);
         const sessionUrl = ` ${AUTOMATION_DASHBOARD_URL}/logs/?sessionID=${this.openedBrowsers[id].sessionID} `;
+
+        if (PROCESS_ENVIRONMENT.LOG_LT_SESSION_URL) {
+            const filePath = PROCESS_ENVIRONMENT.LT_SESSION_LOG_PATH || null;
+
+            await this.writeSessionUrlToFile(sessionUrl, filePath);
+        }
         
         showTrace('sessionURL', sessionUrl);
 
@@ -156,7 +163,20 @@ export default {
             return await _updateJobStatus(sessionID, jobResult, jobData, this.JOB_RESULT);
         }
         return null;
+    },
+
+    async writeSessionUrlToFile (sessionUrl, filePath) {
+        const effectiveFilePath = filePath || 'sessionUrls.txt';
+        const dataToAppend = `${sessionUrl}\n`;
+    
+        try {
+            await fs.appendFile(effectiveFilePath, dataToAppend);
+        } 
+        catch (err) {
+            console.error('Error writing session URLs to file:', err);
+        }
     }
+    
 };
 
 function handlePingError (err, res) {

@@ -78,7 +78,7 @@ export default {
         const sessionUrl = ` ${AUTOMATION_DASHBOARD_URL}/logs/?sessionID=${this.openedBrowsers[id].sessionID} `;
 
         if (PROCESS_ENVIRONMENT.LOG_LT_SESSION_URL) {
-            const filePath = PROCESS_ENVIRONMENT.LT_SESSION_LOG_PATH || null;
+            const filePath = PROCESS_ENVIRONMENT.LT_SESSION_LOG_PATH || 'sessionUrls.txt';
 
             await this.writeSessionUrlToFile(sessionUrl, filePath);
         }
@@ -166,11 +166,10 @@ export default {
     },
 
     async writeSessionUrlToFile (sessionUrl, filePath) {
-        const effectiveFilePath = filePath || 'sessionUrls.txt';
         const dataToAppend = `${sessionUrl}\n`;
     
         try {
-            await fs.appendFile(effectiveFilePath, dataToAppend);
+            await fs.appendFile(filePath, dataToAppend);
         } 
         catch (err) {
             console.error('Error writing session URLs to file:', err);

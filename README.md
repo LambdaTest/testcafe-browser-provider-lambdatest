@@ -112,6 +112,8 @@ Use the following environment variables to set additional configuration options:
  - `LT_TIMEZONE` - Configure tests to run on a custom time zone. (Not for Real Devices)
  - `LT_TUNNEL_NUMBER` - Number of tunnel to be spawned at a time.
  - `LOAD_BALANCED_MODE` - Load balancing between multiple tunnels spawned.
+ - `LOG_LT_SESSION_URL` - true or false, to log all the session urls.
+ - `LT_SESSION_LOG_PATH` - Configure the specific path for the .txt file containing session urls.
 
 Example:
 

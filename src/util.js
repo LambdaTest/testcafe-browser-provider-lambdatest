@@ -237,6 +237,19 @@ async function _parseCapabilities (id, capability) {
             };
         }
 
+        if (capabilities[id] && capabilities[id]['LT:Options'] && capabilities[id]['LT:Options'].appiumVersion) {
+            const appiumVersion = capabilities[id]['LT:Options'].appiumVersion;
+
+            const firstChar = appiumVersion.charAt(0);
+
+            const firstCharNumber = parseInt(firstChar, 10);
+
+            if (firstCharNumber && firstCharNumber >= 2) {
+                capabilities[id].allowW3C = true;
+                capabilities[id].w3cPrefix = 'appium';
+            }
+        }
+
         if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
         capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || capabilities[id].name || `TestCafe test run ${id}`;
 

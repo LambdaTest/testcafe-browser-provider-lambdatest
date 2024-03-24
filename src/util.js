@@ -238,20 +238,8 @@ async function _parseCapabilities (id, capability) {
         }
 
         if (capabilities[id].appiumVersion || capabilities[id]['LT:Options']?.appiumVersion || capabilities[id]['lt:options']?.appiumVersion) {
-            let appiumVersion;
-            
-            if (capabilities[id].appiumVersion) appiumVersion = capabilities[id].appiumVersion;
-            else if (capabilities[id]['LT:Options']?.appiumVersion) appiumVersion = capabilities[id]['LT:Options'].appiumVersion;
-            else if (capabilities[id]['lt:options']?.appiumVersion) appiumVersion = capabilities[id]['lt:options'].appiumVersion;
-
-            const firstChar = appiumVersion.charAt(0);
-
-            const firstCharNumber = parseInt(firstChar, 10);
-
-            if (firstCharNumber && firstCharNumber >= 2) {
-                capabilities[id].allowW3C = true;
-                capabilities[id].w3cPrefix = 'appium';
-            }
+            capabilities[id].allowW3C = true;
+            capabilities[id].w3cPrefix = 'appium';
         }
 
         if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;

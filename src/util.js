@@ -237,6 +237,11 @@ async function _parseCapabilities (id, capability) {
             };
         }
 
+        if (capabilities[id].appiumVersion || capabilities[id]['LT:Options']?.appiumVersion || capabilities[id]['lt:options']?.appiumVersion) {
+            capabilities[id].allowW3C = true;
+            capabilities[id].w3cPrefix = 'appium';
+        }
+
         if (PROCESS_ENVIRONMENT.LT_BUILD) capabilities[id].build = PROCESS_ENVIRONMENT.LT_BUILD;
         capabilities[id].name = PROCESS_ENVIRONMENT.LT_TEST_NAME || capabilities[id].name || `TestCafe test run ${id}`;
 

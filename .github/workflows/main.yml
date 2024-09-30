@@ -1,5 +1,8 @@
 name: Test-cafe Health Check
 on:
+  push:               # Trigger on every push to the specified branch
+  branches:
+    - master 
   schedule:
   - cron: "0 22 * * *" 
   

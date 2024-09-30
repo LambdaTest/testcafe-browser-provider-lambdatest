@@ -11,7 +11,9 @@ $ npm install testcafe-browser-provider-lambdatest
 ```
 
 ## Usage
-Before using this plugin, save the LambdaTest username and access key to environment variables `LT_USERNAME` and `LT_ACCESS_KEY`, as described in [LambdaTest Documentation](https://www.lambdatest.com/support/docs/using-environment-variables-for-authentication-credentials).
+Before using this plugin, save the LambdaTest username and access key to
+environment variables `LT_USERNAME` and `LT_ACCESS_KEY`, as
+described in [LambdaTest Documentation](https://www.lambdatest.com/support/docs/using-environment-variables-for-authentication-credentials).
 
 You can determine the available browser aliases by running
 
@@ -82,7 +84,7 @@ Use the following environment variables to set additional configuration options:
  - `LT_BUILD` - Build name on LambdaTest.
  - `LT_CAPABILITY_PATH` - Path to a file which contains additional capability options as JSON file (eg. config.json)
 
-    ```js
+    ```json
     {
         "Chrome@63.0:Windows 8.1": {
             "network": true,
@@ -134,8 +136,16 @@ Above are not valid for real devices
 
 ## About LambdaTest
 
-[LambdaTest](https://www.lambdatest.com/) is a cloud based selenium grid infrastructure that can help you run automated cross browser compatibility tests on 2000+ different browser and operating system environments. LambdaTest supports all programming languages and frameworks that are supported with Selenium, and have easy integrations with all popular CI/CD platforms. It's a perfect solution to bring your [selenium automation testing](https://www.lambdatest.com/selenium-automation) to cloud based infrastructure that not only helps you increase your test coverage over multiple desktop and mobile browsers, but also allows you to cut down your test execution time by running tests on parallel.
+[LambdaTest](https://www.lambdatest.com/) is a cloud based selenium grid infrastructure that can
+help you run automated cross browser compatibility tests on 2000+
+different browser and operating system environments. LambdaTest supports
+all programming languages and frameworks that are supported with Selenium,
+and have easy integrations with all popular CI/CD platforms. It's a perfect
+solution to bring your [selenium automation testing](https://www.lambdatest.com/selenium-automation)
+to cloud based infrastructure that not only helps you increase your test coverage over
+multiple desktop and mobile browsers, but also allows you to cut down your
+test execution time by running tests on parallel.
 
 ## License
 
-Licensed under the [MIT license](./LICENSE).
+Licensed under the [APACHE license](./LICENSE).

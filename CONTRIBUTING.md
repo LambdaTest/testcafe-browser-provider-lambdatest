@@ -16,12 +16,12 @@ There are many ways in which you can contribute to Test-at-scale.
 &emsp;&emsp;Join our [Discord server](https://discord.gg/99wgdtQ99h).
 
 #### 🐞 Report a bug
-&emsp;&emsp;Report all issues through GitHub Issues and
+&emsp;&emsp;Report all issues through [GitHub Issues](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/issues) and
 provide as much information as you can.
 
 #### 🛠 Create a feature request
 &emsp;&emsp;We welcome all feature requests, whether for new features
-or enhancements to existing features. File your feature request through GitHub Issues.
+or enhancements to existing features. File your feature request through [GitHub Issues](https://github.com/LambdaTest/testcafe-browser-provider-lambdatest/issues).
 
 #### ⚙️ Write code to fix a Bug / new Feature Request
 &emsp;&emsp;We welcome contributions that help make this

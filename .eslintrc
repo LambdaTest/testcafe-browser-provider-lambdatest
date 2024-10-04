@@ -1,5 +1,10 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
   "extends": "eslint:recommended",
   "rules": {
     "no-alert": "error",

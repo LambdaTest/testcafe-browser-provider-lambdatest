@@ -1,8 +1,14 @@
 name: Test-cafe Health Check
 on:
+  push:
+    branches: [ 'master' ]
+
+  pull_request:
+    branches: [ 'master' ]
+
   schedule:
-  - cron: "0 22 * * *" 
-  
+    - cron: "0 22 * * *" 
+
   workflow_dispatch:
    
 jobs:

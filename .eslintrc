@@ -34,7 +34,6 @@
     "no-shadow": "error",
     "no-shadow-restricted-names": "error",
     "no-spaced-func": "error",
-    "no-undef-init": "error",
     "no-unused-expressions": "error",
     "no-with": "error",
     "camelcase": "error",
@@ -65,7 +64,6 @@
     "space-before-blocks": ["error", "always"],
     "prefer-const": "error",
     "no-path-concat": "error",
-    "no-undefined": "error",
     "strict": "off",
     "curly": ["error", "multi-or-nest"],
     "dot-notation": "off",
@@ -88,5 +86,8 @@
   "env": {
     "node": true,
     "es6": true
+  },
+  "globals": {
+    "fixture": true
   }
 }

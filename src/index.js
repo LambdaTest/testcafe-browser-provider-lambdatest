@@ -1,6 +1,6 @@
-"use strict";
-import wd from "wd";
-import fs from "fs/promises";
+'use strict';
+import wd from 'wd';
+import fs from 'fs/promises';
 
 import {
     LT_AUTH_ERROR,
@@ -16,7 +16,7 @@ import {
     _updateJobStatus,
     showTrace,
     LT_TUNNEL_NUMBER,
-} from "./util";
+} from './util';
 
 const WEB_DRIVER_PING_INTERVAL = 30 * 1000;
 
@@ -34,53 +34,55 @@ export default {
     browserNames: [],
 
     openedBrowsers: {},
-    async _startBrowser(id, url, capabilities) {
-        showTrace("StartBrowser Initiated for ", id);
-        console.log("capabilities", capabilities);
+    async _startBrowser (id, url, capabilities) {
+        showTrace('StartBrowser Initiated for ', id);
+        console.log('capabilities', capabilities);
         let webDriver = await wd.promiseChainRemote(
             `https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${AUTOMATION_HUB_URL}:443/wd/hub`,
             443,
         );
 
-        if (capabilities.isRealMobile)
+        if (capabilities.isRealMobile) {
             webDriver = await wd.promiseChainRemote(
                 `https://${PROCESS_ENVIRONMENT.LT_USERNAME}:${PROCESS_ENVIRONMENT.LT_ACCESS_KEY}@${MOBILE_AUTOMATION_HUB_URL}:443/wd/hub`,
                 443,
             );
+        }
 
         const pingWebDriver = () => ping(webDriver);
 
-        showTrace("webDriver ", webDriver);
-        showTrace("pingWebDriver", pingWebDriver);
+        showTrace('webDriver ', webDriver);
+        showTrace('pingWebDriver', pingWebDriver);
 
-        webDriver.once("status", () => {
+        webDriver.once('status', () => {
             webDriver.pingIntervalId = setInterval(
                 pingWebDriver,
                 WEB_DRIVER_PING_INTERVAL,
             );
-            showTrace("pingIntervalId", webDriver.pingIntervalId);
+            showTrace('pingIntervalId', webDriver.pingIntervalId);
         });
         this.openedBrowsers[id] = webDriver;
         showTrace(capabilities);
         try {
             await webDriver.init(capabilities).get(url);
-        } catch (err) {
+        }
+        catch (err) {
             // for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) await _destroy(tunnel);
             this.dispose();
 
-            showTrace("Error while starting browser for ", id);
+            showTrace('Error while starting browser for ', id);
             showTrace(err);
             throw err;
         }
     },
-    async _takeScreenshot(id, screenshotPath) {
+    async _takeScreenshot (id, screenshotPath) {
         const base64Data = await this.openedBrowsers[id].takeScreenshot();
 
         await _saveFile(screenshotPath, base64Data);
     },
     // Required - must be implemented
     // Browser control
-    async openBrowser(id, pageUrl, browserName) {
+    async openBrowser (id, pageUrl, browserName) {
         if (
             !PROCESS_ENVIRONMENT.LT_USERNAME ||
             !PROCESS_ENVIRONMENT.LT_ACCESS_KEY
@@ -93,7 +95,7 @@ export default {
         const capabilities = await _parseCapabilities(id, browserName);
 
         if (capabilities instanceof Error) {
-            showTrace("openBrowser error on  _parseCapabilities", capabilities);
+            showTrace('openBrowser error on  _parseCapabilities', capabilities);
             this.dispose();
             throw capabilities;
         }
@@ -102,77 +104,81 @@ export default {
 
         if (PROCESS_ENVIRONMENT.LOG_LT_SESSION_URL) {
             const filePath =
-                PROCESS_ENVIRONMENT.LT_SESSION_LOG_PATH || "sessionUrls.txt";
+                PROCESS_ENVIRONMENT.LT_SESSION_LOG_PATH || 'sessionUrls.txt';
 
             await this.writeSessionUrlToFile(sessionUrl, filePath);
         }
 
-        showTrace("sessionURL", sessionUrl);
+        showTrace('sessionURL', sessionUrl);
 
         this.setUserAgentMetaInfo(id, sessionUrl);
     },
 
-    async closeBrowser(id) {
-        showTrace("closeBrowser Initiated for ", id);
+    async closeBrowser (id) {
+        showTrace('closeBrowser Initiated for ', id);
         if (this.openedBrowsers[id]) {
             showTrace(this.openedBrowsers[id].sessionID);
             clearInterval(this.openedBrowsers[id].pingIntervalId);
             if (this.openedBrowsers[id].sessionID) {
                 try {
                     await this.openedBrowsers[id].quit();
-                } catch (err) {
+                }
+                catch (err) {
                     showTrace(err);
                 }
-            } else {
-                showTrace("SessionID not found for ", id);
+            }
+            else {
+                showTrace('SessionID not found for ', id);
                 showTrace(this.openedBrowsers[id]);
             }
-        } else showTrace("Browser not found in OPEN STATE for ", id);
+        }
+        else showTrace('Browser not found in OPEN STATE for ', id);
     },
 
     // Optional - implement methods you need, remove other methods
     // Initialization
-    async init() {
+    async init () {
         this.browserNames = await _getBrowserList();
     },
-    async dispose() {
-        showTrace("Dispose Initiated ...");
+    async dispose () {
+        showTrace('Dispose Initiated ...');
         try {
             for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++)
                 await _destroy(tunnel);
-        } catch (err) {
-            showTrace("Error while destroying ...");
+        }
+        catch (err) {
+            showTrace('Error while destroying ...');
             showTrace(err);
         }
-        showTrace("Dispose Completed");
+        showTrace('Dispose Completed');
     },
     // Browser names handling
-    async getBrowserList() {
+    async getBrowserList () {
         return this.browserNames;
     },
 
-    async isValidBrowserName(/* browserName */) {
+    async isValidBrowserName (/* browserName */) {
         return true;
     },
 
     // Extra methods
-    async resizeWindow(id, width, height) {
+    async resizeWindow (id, width, height) {
         const _windowHandle = await this.openedBrowsers[id].windowHandles();
 
         await this.openedBrowsers[id].windowSize(_windowHandle, width, height);
     },
 
-    async maximizeWindow(id) {
+    async maximizeWindow (id) {
         const _windowHandle = await this.openedBrowsers[id].windowHandles();
 
         await this.openedBrowsers[id].maximize(_windowHandle);
     },
 
-    async takeScreenshot(id, screenshotPath) {
+    async takeScreenshot (id, screenshotPath) {
         await this._takeScreenshot(id, screenshotPath);
     },
 
-    async reportJobResult(id, jobResult, jobData) {
+    async reportJobResult (id, jobResult, jobData) {
         if (this.openedBrowsers[id] && this.openedBrowsers[id].sessionID) {
             const sessionID = this.openedBrowsers[id].sessionID;
 
@@ -186,27 +192,29 @@ export default {
         return null;
     },
 
-    async writeSessionUrlToFile(sessionUrl, filePath) {
+    async writeSessionUrlToFile (sessionUrl, filePath) {
         const dataToAppend = `${sessionUrl}\n`;
 
         try {
             await fs.appendFile(filePath, dataToAppend);
-        } catch (err) {
-            console.error("Error writing session URLs to file:", err);
+        }
+        catch (err) {
+            console.error('Error writing session URLs to file:', err);
         }
     },
 };
 
-function handlePingError(err, res) {
+function handlePingError (err, res) {
     if (err) {
-        showTrace("ping error :");
+        showTrace('ping error :');
         showTrace(err);
-    } else {
-        showTrace("ignore ping response :");
+    }
+    else {
+        showTrace('ignore ping response :');
         showTrace(res);
     }
 }
 
-function ping(webDriver) {
+function ping (webDriver) {
     webDriver.safeExecute(1, handlePingError);
 }

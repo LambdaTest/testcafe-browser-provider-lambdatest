@@ -37,10 +37,6 @@ export default {
     /**
      * Asynchronously starts a browser session using WebDriver and initializes the browser with the given capabilities and URL.
      * 
-     * This function connects to a WebDriver hub (depending on whether the target device is a real mobile or not) and starts a browser session.
-     * It also sets up a periodic ping to keep the WebDriver session alive and navigates to the specified URL. 
-     * In case of any errors, the browser session is disposed and the error is thrown.
-     * 
      * @async
      * @function _startBrowser
      * 
@@ -98,9 +94,6 @@ export default {
     /**
      * Asynchronously takes a screenshot of the current browser session and saves it to the specified path.
      * 
-     * This function captures a screenshot from the browser session associated with the given ID, retrieves the image data as a base64 string, 
-     * and then saves the screenshot to the specified file path.
-     * 
      * @async
      * @function _takeScreenshot
      * 
@@ -120,14 +113,6 @@ export default {
 
     /**
      * Asynchronously opens a browser session and navigates to the specified URL.
-     * 
-     * This function performs the following steps:
-     * 1. Verifies the presence of necessary environment variables for authentication.
-     * 2. Establishes connections via tunnels.
-     * 3. Parses the capabilities required for the browser session based on the browser name.
-     * 4. Starts the browser session and navigates to the given URL.
-     * 5. Logs the session URL to a file if logging is enabled.
-     * 6. Sets user-agent metadata for tracking purposes.
      * 
      * @async
      * @function openBrowser
@@ -176,12 +161,6 @@ export default {
     /**
      * Asynchronously closes the browser session for the given ID.
      * 
-     * This function performs the following steps:
-     * 1. Checks if there is an active browser session associated with the provided ID.
-     * 2. Clears the periodic ping interval used to keep the WebDriver session alive.
-     * 3. Attempts to quit the browser session if a valid session ID is found.
-     * 4. Logs errors if the session cannot be closed or if no session is found.
-     * 
      * @async
      * @function closeBrowser
      * 
@@ -215,9 +194,6 @@ export default {
     /**
      * Asynchronously initializes the browser names by retrieving the list of available browsers.
      * 
-     * This function calls the internal `_getBrowserList` method to populate the `browserNames` property 
-     * with the names of the browsers that can be used in the session.
-     * 
      * @async
      * @function init
      * 
@@ -231,9 +207,6 @@ export default {
 
     /**
      * Asynchronously disposes of all active resources, including tunnels.
-     * 
-     * This function iterates through all active tunnels and attempts to destroy them, handling any errors that occur during the process. 
-     * It logs the start and completion of the disposal process as well as any errors encountered while destroying the tunnels.
      * 
      * @async
      * @function dispose
@@ -258,8 +231,6 @@ export default {
     /**
      * Asynchronously retrieves the list of available browser names.
      * 
-     * This function returns the list of browser names that are currently available for use.
-     * 
      * @async
      * @function getBrowserList
      * 
@@ -272,8 +243,6 @@ export default {
     /**
      * Asynchronously checks if the current browser name is valid.
      * 
-     * This function always returns true, indicating that the browser name is considered valid.
-     * 
      * @async
      * @function isValidBrowserName
      * 
@@ -285,9 +254,6 @@ export default {
 
     /**
      * Asynchronously resizes the browser window for the specified session.
-     * 
-     * This function retrieves the current window handle for the browser session associated with the given ID
-     * and resizes the window to the specified width and height.
      * 
      * @async
      * @function resizeWindow
@@ -309,9 +275,6 @@ export default {
     /**
      * Asynchronously maximizes the browser window for the specified session.
      * 
-     * This function retrieves the current window handle for the browser session associated with the given ID
-     * and maximizes the window to take up the full screen.
-     * 
      * @async
      * @function maximizeWindow
      * 
@@ -330,9 +293,6 @@ export default {
     /**
      * Asynchronously takes a screenshot of the specified browser session and saves it to the given file path.
      * 
-     * This function invokes the internal `_takeScreenshot` method, which handles the actual screenshot capturing
-     * and file saving process.
-     * 
      * @async
      * @function takeScreenshot
      * 
@@ -349,9 +309,6 @@ export default {
 
     /**
      * Asynchronously reports the result of a job associated with a browser session.
-     * 
-     * This function checks if there is an active browser session for the given ID. 
-     * If a valid session is found, it updates the job status using the provided job result and job data.
      * 
      * @async
      * @function reportJobResult
@@ -381,9 +338,6 @@ export default {
     /**
      * Asynchronously writes the session URL to a specified file.
      * 
-     * This function appends the provided session URL to the specified file. Each URL is appended on a new line.
-     * If an error occurs during the file writing process, it is logged to the console.
-     * 
      * @async
      * @function writeSessionUrlToFile
      * 
@@ -409,9 +363,6 @@ export default {
 /**
  * Handles the result of a WebDriver ping, logging errors or ignoring responses as necessary.
  * 
- * This function is invoked after a ping operation to the WebDriver. It logs any errors that occur during the ping.
- * If no error occurs, the ping response is logged but ignored.
- * 
  * @function handlePingError
  * 
  * @param {Error|null} err - The error object if an error occurred during the ping, or null if there was no error.
@@ -432,9 +383,6 @@ function handlePingError (err, res) {
 
 /**
  * Pings the given WebDriver session to ensure it remains active.
- * 
- * This function sends a ping command to the provided WebDriver instance by executing a safe operation.
- * If an error occurs during the ping, the `handlePingError` callback is invoked to handler the error.
  * 
  * @function ping
  * 

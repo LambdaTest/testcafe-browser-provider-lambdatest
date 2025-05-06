@@ -25,7 +25,6 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   build:
    runs-on: ubuntu-latest
-   needs: sonarqube-analysis
    env:
        LT_USERNAME: ${{ secrets.LT_USERNAME }} 
        LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}

@@ -12,8 +12,20 @@ on:
   workflow_dispatch:
    
 jobs:
+  sonarqube-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: SonarQube Analysis
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   build:
    runs-on: ubuntu-latest
+   needs: sonarqube-analysis
    env:
        LT_USERNAME: ${{ secrets.LT_USERNAME }} 
        LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}

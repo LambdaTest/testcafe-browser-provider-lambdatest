@@ -30,7 +30,7 @@
   "dependencies": {
     "@babel/runtime-corejs2": "^7.26.0",
     "@lambdatest/node-tunnel": "^4.0.8",
-    "axios": "^1.7.7",
+    "axios": "^1.9.0",
     "desired-capabilities": "^0.1.0",
     "pify": "^6.1.0",
     "pinkie": "^2.0.4",

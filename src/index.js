@@ -31,7 +31,7 @@ export default {
 
     isMultiBrowser: true,
 
-    browserNames: [],
+    browserNames:   [],
     openedBrowsers: {},
 
     /**

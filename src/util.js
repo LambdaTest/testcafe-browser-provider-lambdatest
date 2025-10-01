@@ -43,15 +43,15 @@ if (PROCESS_ENVIRONMENT.LT_ENABLE_TRACE) isTraceEnable = true;
 
 /**
  * Asynchronously makes an API request and checks if the response body is valid JSON.
- * 
+ *
  * @async
  * @function requestApi
- * 
+ *
  * @param {Object} options - Options for API request, including method, headers, and URL.
- * 
- * @returns {Promise<Object|null>} Returns promise resolving to the parsed JSON object if the response is valid JSON, 
+ *
+ * @returns {Promise<Object|null>} Returns promise resolving to the parsed JSON object if the response is valid JSON,
  *                                  or null if an error occurs or the response is not valid JSON.
- * 
+ *
  * @throws {Error} Throws an error if the request fails.
 */
 async function requestApi (options) {
@@ -69,34 +69,33 @@ async function requestApi (options) {
 
 /**
  * Checks if a given string is valid JSON by attempting to parse it.
- * 
+ *
  * @function IsJsonString
- * 
+ *
  * @param {string} str - The string to be checked for valid JSON format.
- * 
- * @returns {Object|boolean} Returns the parsed JSON object if the input string is valid JSON; 
+ *
+ * @returns {Object|boolean} Returns the parsed JSON object if the input string is valid JSON;
  *                          otherwise, it returns `false`.
 */
 function IsJsonString (str) {
     try {
         return JSON.parse(str);
     }
-    // eslint-disable-next-line no-unused-vars
-    catch (e) {
+    catch (_e) {
         return false;
     }
 }
 
 /**
  * Asynchronously retrieves a comprehensive list of available browsers and real devices.
- * 
+ *
  * @async
  * @function _getBrowserList
- * 
+ *
  * @returns {Promise<string[]>} A promise that resolves to an array of strings, where each string represents
- *                               a browser or device formatted as "<name>@<version>:<os>" or 
+ *                               a browser or device formatted as "<name>@<version>:<os>" or
  *                               "<deviceName>@<version>:<os>:isReal" for real devices.
- * 
+ *
  * @throws {Error} Throws an error if any API requests fail or if data retrieval is unsuccessful.
  */
 async function _getBrowserList () {
@@ -183,16 +182,16 @@ async function _getBrowserList () {
 
 /**
  * Asynchronously establishes a connection for the specified tunnel using the LambdaTest tunnel instance.
- * 
+ *
  * @async
  * @function _connect
- * 
+ *
  * @param {number} tunnel - The index of the tunnel to be connected.
- * 
+ *
  * @returns {Promise<void>} Returns a promise that resolves when the tunnel connection has been successfully established.
- * 
+ *
  * @throws {Error} Throws an error if the connection process fails, including issues with instantiation or starting the tunnel.
- * 
+ *
 */
 async function _connect (tunnel) {
     try {
@@ -273,16 +272,16 @@ async function _connect (tunnel) {
 
 /**
  * Asynchronously stops and destroys the specified tunnel connection.
- * 
+ *
  * @async
  * @function _destroy
- * 
+ *
  * @param {number} tunnel - The index of the tunnel to be destroyed.
- * 
+ *
  * @returns {Promise<void>} Returns a promise that resolves when the tunnel has been successfully stopped and destroyed.
- * 
+ *
  * @throws {Error} Throws an error if any issues occur while stopping the tunnel or retrieving the tunnel name.
- * 
+ *
  */
 async function _destroy (tunnel) {
     try {
@@ -305,13 +304,13 @@ async function _destroy (tunnel) {
 
 /**
  * Generates a random integer between 0 (inclusive) and the specified maximum value (exclusive).
- * 
+ *
  * @function getRandomInt
- * 
+ *
  * @param {number} max - The upper limit (exclusive) for the random integer generation.
- * 
+ *
  * @returns {number} A random integer between 0 (inclusive) and max (exclusive).
- * 
+ *
  * @example
  * // Generate a random integer between 0 and 10
  * const randomInt = getRandomInt(10);
@@ -322,18 +321,18 @@ function getRandomInt (max) {
 
 /**
  * Parses the capabilities for a specific browser session based on the provided ID and capability string.
- * 
+ *
  * @async
  * @function _parseCapabilities
- * 
+ *
  * @param {string} id - The unique identifier for the browser session.
  * @param {string} capability - A string representing the capabilities to be parsed.
- * 
+ *
  * @returns {Promise<Object|Error>} A promise that resolves to an object containing the parsed capabilities
  *                                   for the specified session, or an Error object if an error occurs.
- * 
+ *
  * @throws {Error} Throws an error if there is an issue with parsing the capabilities or managing tunnels.
- * 
+ *
  */
 async function _parseCapabilities (id, capability) {
     try {
@@ -538,19 +537,19 @@ async function _parseCapabilities (id, capability) {
 
 /**
  * Updates the job status of a session based on the results of a test run.
- * 
+ *
  * @async
  * @function _updateJobStatus
- * 
+ *
  * @param {string} sessionID - The unique identifier of the session whose job status is to be updated.
  * @param {string} jobResult - The result of the job (e.g., 'done', 'errored', 'aborted').
  * @param {Object} jobData - An object containing information about the job, including total and passed tests.
  * @param {Object} possibleResults - An object that defines possible job result values for comparison.
- * 
+ *
  * @returns {Promise<Object>} A promise that resolves to the response from the request to update the job status.
- * 
+ *
  * @throws {Error} Throws an error if the request to update the job status fails.
- * 
+ *
  */
 async function _updateJobStatus (
     sessionID,
@@ -588,8 +587,7 @@ async function _updateJobStatus (
         },
 
         body: {
-            // eslint-disable-next-line camelcase
-            status_ind: jobPassed ? 'passed' : 'failed',
+            'status_ind': jobPassed ? 'passed' : 'failed',
 
             reason: errorReason,
         },
@@ -602,17 +600,17 @@ async function _updateJobStatus (
 
 /**
  * Waits for a specified tunnel to be in a running state.
- * 
+ *
  * @async
  * @function _waitForTunnelRunning
- * 
+ *
  * @param {number} tunnel - The index of the tunnel to check for its running status.
- * 
+ *
  * @returns {Promise<void>} A promise that resolves when the tunnel is confirmed to be running.
- * 
+ *
  * @throws {Error} Throws an error if the tunnel instance is not properly initialized or if there is an issue
  * checking the running status of the tunnel.
- * 
+ *
  */
 async function _waitForTunnelRunning (tunnel) {
     while (!connectorInstances[tunnel].isRunning) {
@@ -626,16 +624,16 @@ async function _waitForTunnelRunning (tunnel) {
 
 /**
  * Saves a file with the provided base64 data to the specified path.
- * 
+ *
  * @function _saveFile
- * 
+ *
  * @param {string} screenshotPath - The path where the file should be saved, including the file name.
  * @param {string} base64Data - The base64 encoded data to be written to the file.
- * 
+ *
  * @returns {Promise<void>} A promise that resolves when the file is successfully saved.
- * 
+ *
  * @throws {Error} Throws an error if there is an issue writing the file.
- * 
+ *
  */
 function _saveFile (screenshotPath, base64Data) {
     return new Promise((resolve, reject) => {
@@ -647,15 +645,15 @@ function _saveFile (screenshotPath, base64Data) {
 
 /**
  * Retrieves additional capabilities from a JSON file.
- * 
+ *
  * @function _getAdditionalCapabilities
- * 
+ *
  * @param {string} filename - The path to the JSON file containing additional capabilities.
- * 
+ *
  * @returns {Promise<Object>} A promise that resolves with the parsed JSON data.
- * 
+ *
  * @throws {Error} Throws an error if there is an issue reading or parsing the file.
- * 
+ *
  */
 function _getAdditionalCapabilities (filename) {
     return new Promise((resolve, reject) => {
@@ -667,13 +665,13 @@ function _getAdditionalCapabilities (filename) {
 
 /**
  * Creates a promise that resolves after a specified amount of time.
- * 
+ *
  * @function sleep
- * 
+ *
  * @param {number} ms - The number of milliseconds to sleep.
- * 
+ *
  * @returns {Promise<void>} A promise that resolves after the specified duration.
- * 
+ *
  */
 function sleep (ms) {
     return new Promise((resolve) => {
@@ -683,14 +681,14 @@ function sleep (ms) {
 
 /**
  * Logs a message and optional data to the console if tracing is enabled.
- * 
+ *
  * @function showTrace
- * 
+ *
  * @param {string} message - The message to log to the console.
  * @param {*} [data] - Optional data to log along with the message. This can be of any type.
- * 
+ *
  * @returns {void}
- * 
+ *
  */
 function showTrace (message, data) {
     /*eslint no-console: ["error", { allow: ["warn", "log", "error"] }] */

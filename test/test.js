@@ -1,4 +1,3 @@
-/* eslint-disable no-undef,no-unused-expressions */
 // TODO: add tests
 import Page from './page-model';
 

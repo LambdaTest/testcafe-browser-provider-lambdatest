@@ -2,16 +2,15 @@
 const expect = require('chai').expect;
 const lambdatestProvider = require('../../');
 
-// eslint-disable-next-line no-undef
 describe('Browser names', function () {
-    // eslint-disable-next-line no-undef
+
     before(function () {
         this.timeout(20000);
 
         return lambdatestProvider.init();
     });
 
-    // eslint-disable-next-line no-undef
+
     it('Should return list of common browsers and devices', function () {
         return lambdatestProvider.getBrowserList().then(function (list) {
             const commonBrowsers = [

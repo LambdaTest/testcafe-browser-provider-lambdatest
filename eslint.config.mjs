@@ -19,6 +19,8 @@ export default [
         languageOptions: {
             globals: {
                 ...globals.node,
+                ...globals.mocha,
+                fixture: 'readonly',
             },
             parser:        babelParser,
             parserOptions: {
@@ -164,6 +166,20 @@ export default [
             'no-use-before-define':        ['error', 'nofunc'],
             'handle-callback-err':         'off',
             'require-atomic-updates':      'off',
+            'no-unused-vars':              [
+                'error',
+                {
+                    varsIgnorePattern:         '^_',
+                    argsIgnorePattern:         '^_',
+                    caughtErrorsIgnorePattern: '^_'
+                }
+            ]
         },
     },
+    {
+        files: ['test/**/*.js'],
+        rules: {
+            'no-unused-expressions': 'off',
+        },
+    }
 ];

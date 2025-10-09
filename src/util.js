@@ -6,22 +6,53 @@ import parseCapabilities from 'desired-capabilities';
 import LambdaTestTunnel from '@lambdatest/node-tunnel';
 import fs from 'fs';
 import axios from 'axios';
+import {
+    PROCESS_ENVIRONMENT,
+    BASE_URL,
+    MOBILE_BASE_URL,
+    AUTOMATION_BASE_URL,
+    AUTOMATION_DASHBOARD_URL,
+    AUTOMATION_HUB_URL,
+    MOBILE_AUTOMATION_HUB_URL,
+    LT_AUTH_ERROR,
+    LT_TUNNEL_NUMBER,
+    INITIAL_RETRY_COUNTER,
+    IS_TRACE_ENABLE,
+    PLATFORM_ANDROID,
+    PLATFORM_IOS,
+    PLATFORM_ANY,
+    BROWSER_CHROME,
+    BROWSER_SAFARI,
+    BROWSER_FIREFOX,
+    DEVICE_TYPE_REAL,
+    DEVICE_TYPE_IS_REAL,
+    VERSION_ANY,
+    FIREFOX_CUSTOM_TRANSLATION_MIN_VERSION,
+    SAFARI_CUSTOM_TRANSLATION_MIN_VERSION,
+    HTTP_METHOD_PATCH,
+    CONTENT_TYPE_JSON,
+    ENCODING_BASE64,
+    ENCODING_UTF8,
+    JOB_STATUS_PASSED,
+    JOB_STATUS_FAILED,
+    SESSION_ABORTED_MESSAGE,
+    TESTS_FAILED_MESSAGE_SUFFIX,
+    DEFAULT_TUNNEL_LOG_FILE,
+    TUNNEL_CONTROLLER,
+    TUNNEL_NAME_PREFIX,
+    TUNNEL_WAIT_INTERVAL,
+    CLIENT_TESTCAFE,
+    W3C_PREFIX_APPIUM,
+    CAPABILITY_KEY_LT_OPTIONS,
+    CAPABILITY_KEY_LT_OPTIONS_LOWERCASE,
+    CAPABILITY_KEY_SAFARI_COOKIES,
+    CAPABILITY_KEY_SAFARI_POPUPS,
+    CAPABILITY_KEY_SELENIUM_VERSION,
+    CAPABILITY_KEY_BROWSER_VERSION,
+} from './consts.js';
 
 const promisify = (fn) => pify(fn, Promise);
 const request = promisify(_request, Promise);
-
-const PROCESS_ENVIRONMENT = process.env;
-const BASE_URL = 'https://api.lambdatest.com/api/v1';
-const MOBILE_BASE_URL =
-    'https://mobile-api.lambdatest.com/mobile-automation/api/v1';
-const AUTOMATION_BASE_URL = 'https://api.lambdatest.com/automation/api/v1';
-const AUTOMATION_DASHBOARD_URL = 'https://automation.lambdatest.com';
-const AUTOMATION_HUB_URL = process.env.LT_GRID_URL || 'hub.lambdatest.com';
-const MOBILE_AUTOMATION_HUB_URL =
-    process.env.LT_MOBILE_GRID_URL || 'beta-hub.lambdatest.com';
-const LT_AUTH_ERROR =
-    'Authentication failed. Please assign the correct username and access key to the LT_USERNAME and LT_ACCESS_KEY environment variables.';
-const LT_TUNNEL_NUMBER = process.env.LT_TUNNEL_NUMBER || 1;
 
 var connectorInstances = [];
 
@@ -35,11 +66,9 @@ for (let tunnel = 0; tunnel < LT_TUNNEL_NUMBER; tunnel++) {
 
 const capabilities = {};
 
-let retryCounter = 60;
+let retryCounter = INITIAL_RETRY_COUNTER;
 
-var isTraceEnable = false;
-
-if (PROCESS_ENVIRONMENT.LT_ENABLE_TRACE) isTraceEnable = true;
+var isTraceEnable = IS_TRACE_ENABLE;
 
 /**
  * Asynchronously makes an API request and checks if the response body is valid JSON.
@@ -143,13 +172,13 @@ async function _getBrowserList () {
             const iosDevices = brand?.devices;
 
             iosDevices.map((device) => {
-                if (device?.deviceType === 'real') {
+                if (device?.deviceType === DEVICE_TYPE_REAL) {
                     const osVersion = device?.osVersion;
 
                     osVersion.map((version) => {
                         if (device?.isRealDevice === 1) {
                             iosDeviceList.push(
-                                `${device?.deviceName}@${version?.version}:ios:isReal`,
+                                `${device?.deviceName}@${version?.version}:${PLATFORM_IOS}:${DEVICE_TYPE_IS_REAL}`,
                             );
                         }
                     });
@@ -161,13 +190,13 @@ async function _getBrowserList () {
             const androidDevices = item?.devices;
 
             androidDevices.map((device) => {
-                if (device?.deviceType === 'real') {
+                if (device?.deviceType === DEVICE_TYPE_REAL) {
                     const osVersion = device?.osVersion;
 
                     osVersion.map((version) => {
                         if (device?.isRealDevice === 1) {
                             androidDeviceList.push(
-                                `${device?.deviceName}@${version?.version}:android:isReal`,
+                                `${device?.deviceName}@${version?.version}:${PLATFORM_ANDROID}:${DEVICE_TYPE_IS_REAL}`,
                             );
                         }
                     });
@@ -201,7 +230,7 @@ async function _connect (tunnel) {
                 connectorInstances[tunnel].connectorInstance =
                     new LambdaTestTunnel();
                 const logFile =
-                    PROCESS_ENVIRONMENT.LT_LOGFILE || 'lambdaTunnelLog.log';
+                    PROCESS_ENVIRONMENT.LT_LOGFILE || DEFAULT_TUNNEL_LOG_FILE;
                 const v = PROCESS_ENVIRONMENT.LT_VERBOSE;
 
                 connectorInstances[tunnel].tunnelArguments = {
@@ -211,7 +240,7 @@ async function _connect (tunnel) {
 
                     logFile: logFile,
 
-                    controller: 'testcafe',
+                    controller: TUNNEL_CONTROLLER,
                 };
 
                 if (v === 'true' || v === true)
@@ -244,7 +273,7 @@ async function _connect (tunnel) {
                 }
                 else {
                     connectorInstances[tunnel].tunnelArguments.tunnelName =
-                        'TestCafe' +
+                        TUNNEL_NAME_PREFIX +
                         tunnel +
                         `_${PROCESS_ENVIRONMENT.LT_USERNAME}-${new Date().getTime()}`;
                 }
@@ -355,17 +384,17 @@ async function _parseCapabilities (id, capability) {
             plugin: `${testcafeDetail.name}:${testcafeDetail.version}`,
         };
 
-        if (capability.indexOf('isReal') > 0) {
+        if (capability.indexOf(DEVICE_TYPE_IS_REAL) > 0) {
             browserName = capability.split('@')[0];
             lPlatform = platform.split(':')[0];
             capabilities[id].isRealMobile = true;
             if (process.env.LT_VISUAL) capabilities[id].visual = true;
         }
 
-        if (lPlatform === 'android') capabilities[id].browserName = 'chrome';
-        else if (lPlatform === 'ios') capabilities[id].browserName = 'safari';
+        if (lPlatform === PLATFORM_ANDROID) capabilities[id].browserName = BROWSER_CHROME;
+        else if (lPlatform === PLATFORM_IOS) capabilities[id].browserName = BROWSER_SAFARI;
 
-        if (['ios', 'android'].includes(lPlatform)) {
+        if ([PLATFORM_IOS, PLATFORM_ANDROID].includes(lPlatform)) {
             capabilities[id].platformName = lPlatform;
             capabilities[id].deviceName = browserName;
             capabilities[id].platformVersion = browserVersion;
@@ -400,11 +429,11 @@ async function _parseCapabilities (id, capability) {
 
         if (
             capabilities[id].appiumVersion ||
-            capabilities[id]['LT:Options']?.appiumVersion ||
-            capabilities[id]['lt:options']?.appiumVersion
+            capabilities[id][CAPABILITY_KEY_LT_OPTIONS]?.appiumVersion ||
+            capabilities[id][CAPABILITY_KEY_LT_OPTIONS_LOWERCASE]?.appiumVersion
         ) {
             capabilities[id].allowW3C = true;
-            capabilities[id].w3cPrefix = 'appium';
+            capabilities[id].w3cPrefix = W3C_PREFIX_APPIUM;
         }
 
         if (PROCESS_ENVIRONMENT.LT_BUILD)
@@ -429,7 +458,7 @@ async function _parseCapabilities (id, capability) {
 
                     if (!_isRunning) {
                         await _destroy(tunnel);
-                        retryCounter = 60;
+                        retryCounter = INITIAL_RETRY_COUNTER;
                         connectorInstances[tunnel].isRunning = false;
                         await _connect(tunnel);
                     }
@@ -454,7 +483,7 @@ async function _parseCapabilities (id, capability) {
         if (PROCESS_ENVIRONMENT.LT_RESOLUTION)
             capabilities[id].resolution = PROCESS_ENVIRONMENT.LT_RESOLUTION;
         if (PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION) {
-            capabilities[id]['selenium_version'] =
+            capabilities[id][CAPABILITY_KEY_SELENIUM_VERSION] =
                 PROCESS_ENVIRONMENT.LT_SELENIUM_VERSION;
         }
         if (PROCESS_ENVIRONMENT.LT_CONSOLE) capabilities[id].console = true;
@@ -469,58 +498,58 @@ async function _parseCapabilities (id, capability) {
         )
             capabilities[id].w3c = true;
 
-        if (capabilities[id].version === 'any') delete capabilities[id].version;
-        if (capabilities[id].platform === 'any')
+        if (capabilities[id].version === VERSION_ANY) delete capabilities[id].version;
+        if (capabilities[id].platform === PLATFORM_ANY)
             delete capabilities[id].platform;
         if (
             PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === true ||
             PROCESS_ENVIRONMENT.LT_SAFARI_COOKIES === 'true'
         )
-            capabilities[id]['safari.cookies'] = true;
+            capabilities[id][CAPABILITY_KEY_SAFARI_COOKIES] = true;
         if (
             PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === true ||
             PROCESS_ENVIRONMENT.LT_SAFARI_POPUPS === 'true'
         )
-            capabilities[id]['safari.popups'] = true;
+            capabilities[id][CAPABILITY_KEY_SAFARI_POPUPS] = true;
 
         if (
             browserName &&
-            browserName.trim().toLowerCase() === 'firefox' &&
+            browserName.trim().toLowerCase() === BROWSER_FIREFOX &&
             browserVersion &&
-            browserVersion.split('.')[0] > 47 &&
+            browserVersion.split('.')[0] > FIREFOX_CUSTOM_TRANSLATION_MIN_VERSION &&
             !('enableCustomTranslation' in capabilities[id])
         )
             capabilities[id].enableCustomTranslation = true;
 
         if (
             browserName &&
-            browserName.trim().toLowerCase() === 'safari' &&
+            browserName.trim().toLowerCase() === BROWSER_SAFARI &&
             browserVersion &&
-            browserVersion.split('.')[0] > 11 &&
+            browserVersion.split('.')[0] > SAFARI_CUSTOM_TRANSLATION_MIN_VERSION &&
             !('enableCustomTranslation' in capabilities[id])
         )
             capabilities[id].enableCustomTranslation = true;
         if (
             !browserVersion ||
-            browserVersion === 'any' &&
+            browserVersion === VERSION_ANY &&
                 typeof additionalCapabilities[capability] !== 'undefined'
         ) {
             const browserVersionKey =
-                additionalCapabilities[capability]['browserVersion'];
+                additionalCapabilities[capability][CAPABILITY_KEY_BROWSER_VERSION];
 
             if (
                 browserName &&
-                browserName.trim().toLowerCase() === 'firefox' &&
+                browserName.trim().toLowerCase() === BROWSER_FIREFOX &&
                 browserVersionKey &&
-                browserVersionKey.split('.')[0] > 47 &&
+                browserVersionKey.split('.')[0] > FIREFOX_CUSTOM_TRANSLATION_MIN_VERSION &&
                 !('enableCustomTranslation' in capabilities[id])
             )
                 capabilities[id].enableCustomTranslation = true;
             if (
                 browserName &&
-                browserName.trim().toLowerCase() === 'safari' &&
+                browserName.trim().toLowerCase() === BROWSER_SAFARI &&
                 browserVersionKey &&
-                browserVersionKey.split('.')[0] > 11 &&
+                browserVersionKey.split('.')[0] > SAFARI_CUSTOM_TRANSLATION_MIN_VERSION &&
                 !('enableCustomTranslation' in capabilities[id])
             )
                 capabilities[id].enableCustomTranslation = true;
@@ -566,30 +595,30 @@ async function _updateJobStatus (
 
     let errorReason = '';
 
-    if (testsFailed > 0) errorReason = testsFailed + ' tests failed';
+    if (testsFailed > 0) errorReason = testsFailed + TESTS_FAILED_MESSAGE_SUFFIX;
     else if (jobResult === possibleResults.errored)
         errorReason = jobData.message;
     else if (jobResult === possibleResults.aborted)
-        errorReason = 'Session aborted';
+        errorReason = SESSION_ABORTED_MESSAGE;
 
     const options = {
-        method: 'PATCH',
+        method: HTTP_METHOD_PATCH,
 
         uri: `${AUTOMATION_BASE_URL}/sessions/${sessionID}`,
 
         headers: {
             Authorization: `Basic ${Buffer.from(PROCESS_ENVIRONMENT.LT_USERNAME + ':' + PROCESS_ENVIRONMENT.LT_ACCESS_KEY).toString('base64')}`,
 
-            'Content-Type': 'application/json',
+            'Content-Type': CONTENT_TYPE_JSON,
 
-            Accept: 'application/json',
+            Accept: CONTENT_TYPE_JSON,
 
-            client: 'testcafe',
+            client: CLIENT_TESTCAFE,
         },
 
         body: {
             // eslint-disable-next-line camelcase
-            status_ind: jobPassed ? 'passed' : 'failed',
+            status_ind: jobPassed ? JOB_STATUS_PASSED : JOB_STATUS_FAILED,
 
             reason: errorReason,
         },
@@ -616,7 +645,7 @@ async function _updateJobStatus (
  */
 async function _waitForTunnelRunning (tunnel) {
     while (!connectorInstances[tunnel].isRunning) {
-        await sleep(5000);
+        await sleep(TUNNEL_WAIT_INTERVAL);
         retryCounter--;
         connectorInstances[tunnel].isRunning =
             await connectorInstances[tunnel].connectorInstance.isRunning();
@@ -639,7 +668,7 @@ async function _waitForTunnelRunning (tunnel) {
  */
 function _saveFile (screenshotPath, base64Data) {
     return new Promise((resolve, reject) => {
-        fs.writeFile(screenshotPath, base64Data, 'base64', (err) =>
+        fs.writeFile(screenshotPath, base64Data, ENCODING_BASE64, (err) =>
             err ? reject(err) : resolve(),
         );
     });
@@ -659,7 +688,7 @@ function _saveFile (screenshotPath, base64Data) {
  */
 function _getAdditionalCapabilities (filename) {
     return new Promise((resolve, reject) => {
-        fs.readFile(filename, 'utf8', (err, data) =>
+        fs.readFile(filename, ENCODING_UTF8, (err, data) =>
             err ? reject(err) : resolve(JSON.parse(data)),
         );
     });

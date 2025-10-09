@@ -19,8 +19,6 @@ export default [
         languageOptions: {
             globals: {
                 ...globals.node,
-                ...globals.mocha,
-                fixture: 'readonly',
             },
             parser:        babelParser,
             parserOptions: {
@@ -177,7 +175,13 @@ export default [
         },
     },
     {
-        files: ['test/**/*.js'],
+        files:           ['test/**/*.js'],
+        languageOptions: {
+            globals: {
+                ...globals.mocha,
+                fixture: 'readonly'
+            },
+        },
         rules: {
             'no-unused-expressions': 'off',
         },

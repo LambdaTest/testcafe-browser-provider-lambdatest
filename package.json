@@ -47,16 +47,17 @@
     "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@babel/plugin-transform-runtime": "^7.25.9",
     "@babel/preset-env": "^7.26.0",
-    "babel-plugin-add-module-exports": "^1.0.4",
-    "gulp-babel": "^8.0.0",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.13.0",
+    "babel-plugin-add-module-exports": "^1.0.4",
+    "chai": "^6.2.0",
+    "del": "^5.1.0",
     "eslint": "^9.13.0",
     "eslint-scope": "^8.2.0",
-    "gulp-eslint": "^6.0.0",
     "globals": "^15.11.0",
     "gulp": "^5.0.0",
-    "del": "^5.1.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-eslint": "^6.0.0",
     "gulp-mocha": "^7.0.2"
   }
 }

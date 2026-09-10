@@ -13,7 +13,7 @@
 With TestMu AI (Formerly LambdaTest), you can run TestCafe tests across 3,000+ real browsers and operating systems at scale using the TestCafe browser provider plugin, enabling parallel cross-browser testing in the cloud.
 
 - [Sign up on TestMu AI](https://www.testmuai.com/register/) (Formerly LambdaTest).
-- Follow the [TestMu AI Documentation](https://www.testmuai.com/support/docs/npm-plugin-for-testcafe-integration-with-testmu/) for the full setup walkthrough.
+- Follow the [Run TestCafe tests on TestMu AI](https://www.testmuai.com/support/docs/npm-plugin-for-testcafe-integration-with-testmu/) for the full setup walkthrough.
 
 ### Prerequisites
 
